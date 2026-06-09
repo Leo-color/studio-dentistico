@@ -186,6 +186,94 @@ export const saveServiziToFirebase = async (servizi) => {
   }
 };
 
+// Sincronizza Studio in tempo reale
+export const subscribeToStudio = (callback) => {
+  if (!initFirebase()) {
+    console.warn('Firebase non configurato');
+    return () => {};
+  }
+
+  try {
+    const unsubscribe = onSnapshot(doc(db, 'studio', 'info'), (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        console.log('Studio sincronizzato da Firebase');
+        callback(docSnapshot.data());
+      }
+    });
+
+    return unsubscribe;
+  } catch (error) {
+    console.error('Errore sincronizzazione studio:', error);
+    return () => {};
+  }
+};
+
+// Sincronizza Orari in tempo reale
+export const subscribeToOrari = (callback) => {
+  if (!initFirebase()) {
+    console.warn('Firebase non configurato');
+    return () => {};
+  }
+
+  try {
+    const unsubscribe = onSnapshot(doc(db, 'config', 'orari'), (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        console.log('Orari sincronizzati da Firebase');
+        callback(docSnapshot.data());
+      }
+    });
+
+    return unsubscribe;
+  } catch (error) {
+    console.error('Errore sincronizzazione orari:', error);
+    return () => {};
+  }
+};
+
+// Sincronizza Servizi in tempo reale
+export const subscribeToServizi = (callback) => {
+  if (!initFirebase()) {
+    console.warn('Firebase non configurato');
+    return () => {};
+  }
+
+  try {
+    const unsubscribe = onSnapshot(doc(db, 'config', 'servizi'), (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        console.log('Servizi sincronizzati da Firebase');
+        callback(docSnapshot.data().lista || []);
+      }
+    });
+
+    return unsubscribe;
+  } catch (error) {
+    console.error('Errore sincronizzazione servizi:', error);
+    return () => {};
+  }
+};
+
+// Sincronizza Ferie in tempo reale
+export const subscribeToFerie = (callback) => {
+  if (!initFirebase()) {
+    console.warn('Firebase non configurato');
+    return () => {};
+  }
+
+  try {
+    const unsubscribe = onSnapshot(doc(db, 'config', 'ferie'), (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        console.log('Ferie sincronizzate da Firebase');
+        callback(docSnapshot.data().lista || []);
+      }
+    });
+
+    return unsubscribe;
+  } catch (error) {
+    console.error('Errore sincronizzazione ferie:', error);
+    return () => {};
+  }
+};
+
 export const getFirebaseInstance = () => {
   initFirebase();
   return db;

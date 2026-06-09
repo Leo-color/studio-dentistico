@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import { sendConfirmationEmail, sendAdminNotificationEmail } from '../services/emailService';
 import { scheduleReminderSMS } from '../services/smsService';
 import { addToGoogleCalendar } from '../services/calendarService';
-import { savePrenotazioneToFirebase, updatePrenotazioneInFirebase, deletePrenotazioneFromFirebase, subscribeToPrenotazioni, saveStudioToFirebase, saveOrariToFirebase, saveServiziToFirebase } from '../services/firebaseService';
+import { savePrenotazioneToFirebase, updatePrenotazioneInFirebase, deletePrenotazioneFromFirebase, subscribeToPrenotazioni, subscribeToStudio, subscribeToOrari, subscribeToServizi, subscribeToFerie, saveStudioToFirebase, saveOrariToFirebase, saveServiziToFirebase } from '../services/firebaseService';
 
 export const StudioContext = createContext();
 
@@ -74,13 +74,43 @@ export const StudioProvider = ({ children }) => {
     if (adminToken) setAdminLogged(true);
 
     // Sincronizza prenotazioni da Firebase
-    const unsubscribe = subscribeToPrenotazioni((firebasePrenotazioni) => {
+    const unsubscribePrenotazioni = subscribeToPrenotazioni((firebasePrenotazioni) => {
       if (firebasePrenotazioni.length > 0) {
         setPrenotazioni(firebasePrenotazioni);
       }
     });
 
-    return unsubscribe;
+    // Sincronizza Studio da Firebase
+    const unsubscribeStudio = subscribeToStudio((firebaseStudio) => {
+      setStudio(firebaseStudio);
+    });
+
+    // Sincronizza Orari da Firebase
+    const unsubscribeOrari = subscribeToOrari((firebaseOrari) => {
+      setOrari(firebaseOrari);
+    });
+
+    // Sincronizza Servizi da Firebase
+    const unsubscribeServizi = subscribeToServizi((firebaseServizi) => {
+      if (firebaseServizi.length > 0) {
+        setServizi(firebaseServizi);
+      }
+    });
+
+    // Sincronizza Ferie da Firebase
+    const unsubscribeFerie = subscribeToFerie((firebaseFerie) => {
+      if (firebaseFerie.length > 0) {
+        setFerie(firebaseFerie);
+      }
+    });
+
+    return () => {
+      unsubscribePrenotazioni();
+      unsubscribeStudio();
+      unsubscribeOrari();
+      unsubscribeServizi();
+      unsubscribeFerie();
+    };
   }, []);
 
   // Save a localStorage
