@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import { sendConfirmationEmail, sendAdminNotificationEmail } from '../services/emailService';
 import { scheduleReminderSMS } from '../services/smsService';
 import { addToGoogleCalendar } from '../services/calendarService';
-import { savePrenotazioneToFirebase, updatePrenotazioneInFirebase, deletePrenotazioneFromFirebase, subscribeToPrenotazioni, subscribeToStudio, subscribeToOrari, subscribeToServizi, subscribeToFerie, saveStudioToFirebase, saveOrariToFirebase, saveServiziToFirebase } from '../services/firebaseService';
+import { savePrenotazioneToFirebase, updatePrenotazioneInFirebase, deletePrenotazioneFromFirebase, subscribeToPrenotazioni, subscribeToStudio, subscribeToOrari, subscribeToServizi, subscribeToFerie, saveStudioToFirebase, saveOrariToFirebase, saveServiziToFirebase, saveFerieToFirebase } from '../services/firebaseService';
 
 export const StudioContext = createContext();
 
@@ -137,6 +137,23 @@ export const StudioProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
+
+  // Salva su Firebase quando cambiano i dati
+  useEffect(() => {
+    saveStudioToFirebase(studio);
+  }, [studio]);
+
+  useEffect(() => {
+    saveOrariToFirebase(orari);
+  }, [orari]);
+
+  useEffect(() => {
+    saveServiziToFirebase(servizi);
+  }, [servizi]);
+
+  useEffect(() => {
+    saveFerieToFirebase(ferie);
+  }, [ferie]);
 
   const addToast = (message, type = 'info') => {
     const id = Date.now();

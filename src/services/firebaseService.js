@@ -1,6 +1,6 @@
 // Firebase Service - Sincronizzazione Prenotazioni
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 // Configurazione Firebase (da environment variables)
@@ -123,14 +123,13 @@ export const saveStudioToFirebase = async (studio) => {
 
   try {
     const docRef = doc(db, 'studio', 'info');
-    await updateDoc(docRef);
+    await updateDoc(docRef, studio);
+    console.log('Studio salvato su Firebase');
   } catch (error) {
     // Se non esiste, crealo
     try {
-      await addDoc(collection(db, 'studio'), {
-        ...studio,
-        docId: 'info',
-      });
+      await setDoc(doc(db, 'studio', 'info'), studio);
+      console.log('Studio creato su Firebase');
     } catch (addError) {
       console.error('Errore salvataggio studio:', addError);
     }
@@ -175,13 +174,38 @@ export const saveServiziToFirebase = async (servizi) => {
   } catch (error) {
     // Se non esiste, crealo
     try {
-      await addDoc(collection(db, 'config'), {
-        docId: 'servizi',
+      await setDoc(doc(db, 'config', 'servizi'), {
         lista: servizi,
         updatedAt: new Date().toISOString(),
       });
+      console.log('Servizi creati su Firebase');
     } catch (addError) {
       console.error('Errore salvataggio servizi:', addError);
+    }
+  }
+};
+
+// Salva Ferie su Firebase
+export const saveFerieToFirebase = async (ferie) => {
+  if (!initFirebase()) {
+    console.warn('Firebase non configurato');
+    return;
+  }
+
+  try {
+    const docRef = doc(db, 'config', 'ferie');
+    await updateDoc(docRef, { lista: ferie, updatedAt: new Date().toISOString() });
+    console.log('Ferie salvate su Firebase');
+  } catch (error) {
+    // Se non esiste, crealo
+    try {
+      await setDoc(doc(db, 'config', 'ferie'), {
+        lista: ferie,
+        updatedAt: new Date().toISOString(),
+      });
+      console.log('Ferie create su Firebase');
+    } catch (addError) {
+      console.error('Errore salvataggio ferie:', addError);
     }
   }
 };
