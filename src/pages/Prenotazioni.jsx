@@ -34,12 +34,14 @@ export const Prenotazioni = () => {
     if (!selectedData || !selectedServizio || !orari) return { mattina: [], pomeriggio: [] };
 
     const servizio = servizi.find(s => s.id === selectedServizio);
+    if (!servizio || !servizio.durata) return { mattina: [], pomeriggio: [] };
+
     const dataStr = selectedData.toISOString().split('T')[0];
 
     // Controlla se è in ferie
     const isInFerie = ferie && ferie.some(f => {
-      const dal = new Date(f.dal);
-      const al = new Date(f.al);
+      const dal = new Date(f.dal + 'T00:00:00');
+      const al = new Date(f.al + 'T23:59:59');
       const selected = new Date(selectedData);
       return selected >= dal && selected <= al;
     });
@@ -52,56 +54,62 @@ export const Prenotazioni = () => {
 
     if (!dayOrari || !dayOrari.aperto) return { mattina: [], pomeriggio: [] };
 
-    // Genera slot da 30 minuti
-    const generateSlots = (start, end, pausaStart, pausaEnd) => {
-      const slots = [];
-      const [startH, startM] = start.split(':').map(Number);
-      const [endH, endM] = end.split(':').map(Number);
-      let current = startH * 60 + startM;
-      const endTime = endH * 60 + endM;
+    // Funzione per convertire orario a minuti
+    const timeToMinutes = (timeStr) => {
+      if (!timeStr) return 0;
+      const [h, m] = timeStr.split(':').map(Number);
+      return h * 60 + (m || 0);
+    };
 
-      while (current + (servizio?.durata || 30) <= endTime) {
+    // Genera slot da 30 minuti tra start e end
+    const generateSlots = (startTime, endTime) => {
+      const slots = [];
+      let current = startTime;
+      const duration = servizio.durata || 30;
+
+      while (current + duration <= endTime) {
         const h = Math.floor(current / 60);
         const m = current % 60;
         const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-
-        // Verifica che non sia in pausa
-        if (pausaStart && pausaEnd) {
-          const [pausaH, pausaM] = pausaStart.split(':').map(Number);
-          const pauseStart = pausaH * 60 + pausaM;
-          const pauseEnd = pausaEnd.split(':').map((x, i) => i === 0 ? Number(x) : Number(x)).reduce((h, m, i) => i === 0 ? h * 60 : h + m);
-          if (current >= pauseStart && current < pauseEnd) {
-            current += 30;
-            continue;
-          }
-        }
-
         slots.push(timeStr);
         current += 30;
       }
       return slots;
     };
 
-    const mattineSlots = generateSlots(dayOrari.apertura, dayOrari.pausaDa || dayOrari.chiusura, null, null);
-    const pomeriggioSlots = dayOrari.pausaDa ? generateSlots(dayOrari.pausaA, dayOrari.chiusura, null, null) : [];
+    const aperturaMin = timeToMinutes(dayOrari.apertura);
+    const chiusuraMin = timeToMinutes(dayOrari.chiusura);
+    const pausaDaMin = dayOrari.pausaDa ? timeToMinutes(dayOrari.pausaDa) : null;
+    const pausaAMin = dayOrari.pausaA ? timeToMinutes(dayOrari.pausaA) : null;
+
+    let mattineSlots = [];
+    let pomeriggioSlots = [];
+
+    if (pausaDaMin && pausaAMin) {
+      // C'è pausa: mattina da apertura a pausaDa, pomeriggio da pausaA a chiusura
+      mattineSlots = generateSlots(aperturaMin, pausaDaMin);
+      pomeriggioSlots = generateSlots(pausaAMin, chiusuraMin);
+    } else {
+      // Niente pausa: tutti gli orari in mattina
+      mattineSlots = generateSlots(aperturaMin, chiusuraMin);
+    }
 
     // Controlla slot occupati
-    const occupiedSlots = prenotazioni
+    const occupiedSlots = new Set();
+    prenotazioni
       .filter(p => p.data === dataStr)
-      .reduce((acc, p) => {
-        const [hours, mins] = p.orario.split(':');
-        const startTime = hours * 60 + parseInt(mins);
-        const endTime = startTime + (servizio?.durata || 30);
+      .forEach(p => {
+        const startMin = timeToMinutes(p.orario);
+        const endMin = startMin + (servizio.durata || 30);
         const allSlots = [...mattineSlots, ...pomeriggioSlots];
+
         allSlots.forEach(slot => {
-          const [h, m] = slot.split(':').map(Number);
-          const slotTime = h * 60 + m;
-          if (slotTime >= startTime && slotTime < endTime) {
-            acc.add(slot);
+          const slotMin = timeToMinutes(slot);
+          if (slotMin >= startMin && slotMin < endMin) {
+            occupiedSlots.add(slot);
           }
         });
-        return acc;
-      }, new Set());
+      });
 
     return {
       mattina: mattineSlots.map(slot => ({
