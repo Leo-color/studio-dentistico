@@ -213,9 +213,13 @@ const subscribeWithPolling = (collectionPath, docName, callback, pollIntervalMs 
 
   try {
     unsubscribe = onSnapshot(doc(db, collectionPath, docName), (docSnapshot) => {
+      let newData = null;
       if (docSnapshot.exists()) {
         const docData = docSnapshot.data();
-        const newData = docData.data || docData;
+        newData = docData.data || docData;
+      }
+      // Chiama sempre il callback, anche se il documento non esiste
+      if (newData && JSON.stringify(newData) !== JSON.stringify(lastData)) {
         console.log(`Listener ${docName} aggiornato:`, newData);
         lastData = newData;
         callback(newData);
