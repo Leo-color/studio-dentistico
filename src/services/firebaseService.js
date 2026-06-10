@@ -51,7 +51,7 @@ export const savePrenotazioneToFirebase = async (prenotazione) => {
     return docRef.id;
   } catch (error) {
     console.error('Errore salvataggio prenotazione:', error);
-    return prenotazione.id;
+    throw error;
   }
 };
 
@@ -64,7 +64,10 @@ export const updatePrenotazioneInFirebase = async (id, updates) => {
 
   try {
     const docRef = doc(db, 'prenotazioni', id);
-    await updateDoc(docRef, updates);
+    await updateDoc(docRef, {
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    });
     console.log('Prenotazione aggiornata su Firebase:', id);
   } catch (error) {
     console.error('Errore aggiornamento prenotazione:', error);
@@ -123,12 +126,11 @@ export const saveStudioToFirebase = async (studio) => {
 
   try {
     const docRef = doc(db, 'studio', 'info');
-    await updateDoc(docRef, studio);
+    await updateDoc(docRef, { data: studio, updatedAt: new Date().toISOString() });
     console.log('Studio salvato su Firebase');
   } catch (error) {
-    // Se non esiste, crealo
     try {
-      await setDoc(doc(db, 'studio', 'info'), studio);
+      await setDoc(doc(db, 'studio', 'info'), { data: studio, updatedAt: new Date().toISOString() });
       console.log('Studio creato su Firebase');
     } catch (addError) {
       console.error('Errore salvataggio studio:', addError);
@@ -148,12 +150,8 @@ export const saveOrariToFirebase = async (orari) => {
     await updateDoc(docRef, { data: orari, updatedAt: new Date().toISOString() });
     console.log('Orari salvati su Firebase');
   } catch (error) {
-    // Se non esiste, crealo
     try {
-      await setDoc(doc(db, 'config', 'orari'), {
-        data: orari,
-        updatedAt: new Date().toISOString(),
-      });
+      await setDoc(doc(db, 'config', 'orari'), { data: orari, updatedAt: new Date().toISOString() });
       console.log('Orari creati su Firebase');
     } catch (addError) {
       console.error('Errore salvataggio orari:', addError);
@@ -170,15 +168,11 @@ export const saveServiziToFirebase = async (servizi) => {
 
   try {
     const docRef = doc(db, 'config', 'servizi');
-    await updateDoc(docRef, { lista: servizi, updatedAt: new Date().toISOString() });
+    await updateDoc(docRef, { data: servizi, updatedAt: new Date().toISOString() });
     console.log('Servizi salvati su Firebase');
   } catch (error) {
-    // Se non esiste, crealo
     try {
-      await setDoc(doc(db, 'config', 'servizi'), {
-        lista: servizi,
-        updatedAt: new Date().toISOString(),
-      });
+      await setDoc(doc(db, 'config', 'servizi'), { data: servizi, updatedAt: new Date().toISOString() });
       console.log('Servizi creati su Firebase');
     } catch (addError) {
       console.error('Errore salvataggio servizi:', addError);
@@ -195,15 +189,11 @@ export const saveFerieToFirebase = async (ferie) => {
 
   try {
     const docRef = doc(db, 'config', 'ferie');
-    await updateDoc(docRef, { lista: ferie, updatedAt: new Date().toISOString() });
+    await updateDoc(docRef, { data: ferie, updatedAt: new Date().toISOString() });
     console.log('Ferie salvate su Firebase');
   } catch (error) {
-    // Se non esiste, crealo
     try {
-      await setDoc(doc(db, 'config', 'ferie'), {
-        lista: ferie,
-        updatedAt: new Date().toISOString(),
-      });
+      await setDoc(doc(db, 'config', 'ferie'), { data: ferie, updatedAt: new Date().toISOString() });
       console.log('Ferie create su Firebase');
     } catch (addError) {
       console.error('Errore salvataggio ferie:', addError);
@@ -211,34 +201,8 @@ export const saveFerieToFirebase = async (ferie) => {
   }
 };
 
-// Sincronizza Studio in tempo reale
-export const subscribeToStudio = (callback) => {
-  if (!initFirebase()) {
-    console.warn('Firebase non configurato');
-    return () => {};
-  }
-
-  try {
-    const unsubscribe = onSnapshot(doc(db, 'studio', 'info'), (docSnapshot) => {
-      if (docSnapshot.exists()) {
-        console.log('Studio sincronizzato da Firebase');
-        callback(docSnapshot.data());
-      } else {
-        console.log('Documento studio non esiste in Firebase');
-      }
-    }, (error) => {
-      console.error('Errore listener studio:', error);
-    });
-
-    return unsubscribe;
-  } catch (error) {
-    console.error('Errore sincronizzazione studio:', error);
-    return () => {};
-  }
-};
-
-// Sincronizza Orari in tempo reale (con polling fallback)
-export const subscribeToOrari = (callback) => {
+// Helper per subscribere con polling fallback
+const subscribeWithPolling = (collectionPath, docName, callback, pollIntervalMs = 3000) => {
   if (!initFirebase()) {
     console.warn('Firebase non configurato');
     return () => {};
@@ -248,40 +212,38 @@ export const subscribeToOrari = (callback) => {
   let unsubscribe = null;
 
   try {
-    console.log('Setup listener Orari per: config/orari');
-    unsubscribe = onSnapshot(doc(db, 'config', 'orari'), (docSnapshot) => {
-      console.log('Listener Orari triggered! Exists:', docSnapshot.exists());
+    unsubscribe = onSnapshot(doc(db, collectionPath, docName), (docSnapshot) => {
       if (docSnapshot.exists()) {
         const docData = docSnapshot.data();
         const newData = docData.data || docData;
-        console.log('Orari sincronizzati da Firebase:', newData);
+        console.log(`Listener ${docName} aggiornato:`, newData);
         lastData = newData;
         callback(newData);
       }
     }, (error) => {
-      console.error('Errore listener orari:', error);
+      console.error(`Errore listener ${docName}:`, error);
     });
   } catch (error) {
-    console.error('Errore setup listener orari:', error);
+    console.error(`Errore setup listener ${docName}:`, error);
   }
 
-  // Aggiungi polling periodico come fallback
+  // Polling fallback
   const pollInterval = setInterval(async () => {
     try {
-      const docSnapshot = await getDoc(doc(db, 'config', 'orari'));
+      const docSnapshot = await getDoc(doc(db, collectionPath, docName));
       if (docSnapshot.exists()) {
         const docData = docSnapshot.data();
         const newData = docData.data || docData;
         if (JSON.stringify(newData) !== JSON.stringify(lastData)) {
-          console.log('Polling: Orari aggiornati da Firebase:', newData);
+          console.log(`Polling ${docName} aggiornato:`, newData);
           lastData = newData;
           callback(newData);
         }
       }
     } catch (error) {
-      console.error('Errore polling orari:', error);
+      console.error(`Errore polling ${docName}:`, error);
     }
-  }, 3000); // Polling ogni 3 secondi
+  }, pollIntervalMs);
 
   return () => {
     if (unsubscribe) unsubscribe();
@@ -289,56 +251,24 @@ export const subscribeToOrari = (callback) => {
   };
 };
 
+// Sincronizza Studio in tempo reale
+export const subscribeToStudio = (callback) => {
+  return subscribeWithPolling('studio', 'info', callback);
+};
+
+// Sincronizza Orari in tempo reale
+export const subscribeToOrari = (callback) => {
+  return subscribeWithPolling('config', 'orari', callback);
+};
+
 // Sincronizza Servizi in tempo reale
 export const subscribeToServizi = (callback) => {
-  if (!initFirebase()) {
-    console.warn('Firebase non configurato');
-    return () => {};
-  }
-
-  try {
-    const unsubscribe = onSnapshot(doc(db, 'config', 'servizi'), (docSnapshot) => {
-      if (docSnapshot.exists()) {
-        console.log('Servizi sincronizzati da Firebase');
-        callback(docSnapshot.data().lista || []);
-      } else {
-        console.log('Documento servizi non esiste in Firebase');
-      }
-    }, (error) => {
-      console.error('Errore listener servizi:', error);
-    });
-
-    return unsubscribe;
-  } catch (error) {
-    console.error('Errore sincronizzazione servizi:', error);
-    return () => {};
-  }
+  return subscribeWithPolling('config', 'servizi', callback);
 };
 
 // Sincronizza Ferie in tempo reale
 export const subscribeToFerie = (callback) => {
-  if (!initFirebase()) {
-    console.warn('Firebase non configurato');
-    return () => {};
-  }
-
-  try {
-    const unsubscribe = onSnapshot(doc(db, 'config', 'ferie'), (docSnapshot) => {
-      if (docSnapshot.exists()) {
-        console.log('Ferie sincronizzate da Firebase');
-        callback(docSnapshot.data().lista || []);
-      } else {
-        console.log('Documento ferie non esiste in Firebase');
-      }
-    }, (error) => {
-      console.error('Errore listener ferie:', error);
-    });
-
-    return unsubscribe;
-  } catch (error) {
-    console.error('Errore sincronizzazione ferie:', error);
-    return () => {};
-  }
+  return subscribeWithPolling('config', 'ferie', callback);
 };
 
 export const getFirebaseInstance = () => {
