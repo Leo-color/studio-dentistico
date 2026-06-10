@@ -7,7 +7,7 @@ import Modal from '../components/Modal';
 
 export const Prenotazioni = () => {
   const navigate = useNavigate();
-  const { servizi, prenotazioni, addPrenotazione, addToast, setPrivacyModalOpen } = useStudio();
+  const { servizi, prenotazioni, addPrenotazione, addToast, setPrivacyModalOpen, orari, ferie } = useStudio();
 
   // Scroll in alto quando la pagina carica
   React.useEffect(() => {
@@ -29,31 +29,73 @@ export const Prenotazioni = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Generi gli slot disponibili per la data selezionata
+  // Genera gli slot disponibili basandosi su orari dal context
   const availableSlots = useMemo(() => {
-    if (!selectedData || !selectedServizio) return { mattina: [], pomeriggio: [] };
+    if (!selectedData || !selectedServizio || !orari) return { mattina: [], pomeriggio: [] };
 
     const servizio = servizi.find(s => s.id === selectedServizio);
-    const slots = {
-      mattina: ['09:00', '10:00', '11:00', '12:00', '12:30'],
-      pomeriggio: ['14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'],
+    const dataStr = selectedData.toISOString().split('T')[0];
+
+    // Controlla se è in ferie
+    const isInFerie = ferie && ferie.some(f => {
+      const dal = new Date(f.dal);
+      const al = new Date(f.al);
+      const selected = new Date(selectedData);
+      return selected >= dal && selected <= al;
+    });
+
+    if (isInFerie) return { mattina: [], pomeriggio: [] };
+
+    // Ottieni il giorno della settimana e gli orari
+    const dayName = ['domenica', 'lunedi', 'martedi', 'mercoledi', 'giovedi', 'venerdi', 'sabato'][selectedData.getDay()];
+    const dayOrari = orari[dayName];
+
+    if (!dayOrari || !dayOrari.aperto) return { mattina: [], pomeriggio: [] };
+
+    // Genera slot da 30 minuti
+    const generateSlots = (start, end, pausaStart, pausaEnd) => {
+      const slots = [];
+      const [startH, startM] = start.split(':').map(Number);
+      const [endH, endM] = end.split(':').map(Number);
+      let current = startH * 60 + startM;
+      const endTime = endH * 60 + endM;
+
+      while (current + (servizio?.durata || 30) <= endTime) {
+        const h = Math.floor(current / 60);
+        const m = current % 60;
+        const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+        // Verifica che non sia in pausa
+        if (pausaStart && pausaEnd) {
+          const [pausaH, pausaM] = pausaStart.split(':').map(Number);
+          const pauseStart = pausaH * 60 + pausaM;
+          const pauseEnd = pausaEnd.split(':').map((x, i) => i === 0 ? Number(x) : Number(x)).reduce((h, m, i) => i === 0 ? h * 60 : h + m);
+          if (current >= pauseStart && current < pauseEnd) {
+            current += 30;
+            continue;
+          }
+        }
+
+        slots.push(timeStr);
+        current += 30;
+      }
+      return slots;
     };
 
-    // Controlla quali slot sono occupati
+    const mattineSlots = generateSlots(dayOrari.apertura, dayOrari.pausaDa || dayOrari.chiusura, null, null);
+    const pomeriggioSlots = dayOrari.pausaDa ? generateSlots(dayOrari.pausaA, dayOrari.chiusura, null, null) : [];
+
+    // Controlla slot occupati
     const occupiedSlots = prenotazioni
-      .filter(p => p.data === selectedData.toISOString().split('T')[0])
+      .filter(p => p.data === dataStr)
       .reduce((acc, p) => {
         const [hours, mins] = p.orario.split(':');
-        const startTime = new Date();
-        startTime.setHours(parseInt(hours), parseInt(mins));
-        const endTime = new Date(startTime.getTime() + servizio.durata * 60000);
-
-        // Marca tutti gli slot che si sovrappongono
-        [...slots.mattina, ...slots.pomeriggio].forEach(slot => {
-          const [h, m] = slot.split(':');
-          const slotTime = new Date();
-          slotTime.setHours(parseInt(h), parseInt(m));
-
+        const startTime = hours * 60 + parseInt(mins);
+        const endTime = startTime + (servizio?.durata || 30);
+        const allSlots = [...mattineSlots, ...pomeriggioSlots];
+        allSlots.forEach(slot => {
+          const [h, m] = slot.split(':').map(Number);
+          const slotTime = h * 60 + m;
           if (slotTime >= startTime && slotTime < endTime) {
             acc.add(slot);
           }
@@ -62,16 +104,16 @@ export const Prenotazioni = () => {
       }, new Set());
 
     return {
-      mattina: slots.mattina.map(slot => ({
+      mattina: mattineSlots.map(slot => ({
         time: slot,
         disabled: occupiedSlots.has(slot),
       })),
-      pomeriggio: slots.pomeriggio.map(slot => ({
+      pomeriggio: pomeriggioSlots.map(slot => ({
         time: slot,
         disabled: occupiedSlots.has(slot),
       })),
     };
-  }, [selectedData, selectedServizio, servizi, prenotazioni]);
+  }, [selectedData, selectedServizio, servizi, prenotazioni, orari, ferie]);
 
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;

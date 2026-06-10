@@ -9,6 +9,11 @@ export const AdminOrari = () => {
   const [newFeria, setNewFeria] = useState({ dal: '', al: '', motivo: '' });
   const [localOrari, setLocalOrari] = useState(orari);
 
+  // Sincronizza localOrari quando orari cambia da Firebase
+  React.useEffect(() => {
+    setLocalOrari(orari);
+  }, [orari]);
+
   const giorni = [
     { key: 'lunedi', label: 'Lunedì' },
     { key: 'martedi', label: 'Martedì' },

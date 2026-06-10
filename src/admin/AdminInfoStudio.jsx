@@ -8,6 +8,11 @@ export const AdminInfoStudio = () => {
   const [formData, setFormData] = useState(studio);
   const [savedMessage, setSavedMessage] = useState('');
 
+  // Sincronizza formData quando studio cambia da Firebase
+  React.useEffect(() => {
+    setFormData(studio);
+  }, [studio]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
