@@ -150,10 +150,8 @@ export const saveOrariToFirebase = async (orari) => {
   } catch (error) {
     // Se non esiste, crealo
     try {
-      await addDoc(collection(db, 'config'), {
-        ...orari,
-        docId: 'orari',
-      });
+      await setDoc(doc(db, 'config', 'orari'), orari);
+      console.log('Orari creati su Firebase');
     } catch (addError) {
       console.error('Errore salvataggio orari:', addError);
     }
@@ -222,7 +220,11 @@ export const subscribeToStudio = (callback) => {
       if (docSnapshot.exists()) {
         console.log('Studio sincronizzato da Firebase');
         callback(docSnapshot.data());
+      } else {
+        console.log('Documento studio non esiste in Firebase');
       }
+    }, (error) => {
+      console.error('Errore listener studio:', error);
     });
 
     return unsubscribe;
@@ -244,7 +246,11 @@ export const subscribeToOrari = (callback) => {
       if (docSnapshot.exists()) {
         console.log('Orari sincronizzati da Firebase');
         callback(docSnapshot.data());
+      } else {
+        console.log('Documento orari non esiste in Firebase');
       }
+    }, (error) => {
+      console.error('Errore listener orari:', error);
     });
 
     return unsubscribe;
@@ -266,7 +272,11 @@ export const subscribeToServizi = (callback) => {
       if (docSnapshot.exists()) {
         console.log('Servizi sincronizzati da Firebase');
         callback(docSnapshot.data().lista || []);
+      } else {
+        console.log('Documento servizi non esiste in Firebase');
       }
+    }, (error) => {
+      console.error('Errore listener servizi:', error);
     });
 
     return unsubscribe;
@@ -288,7 +298,11 @@ export const subscribeToFerie = (callback) => {
       if (docSnapshot.exists()) {
         console.log('Ferie sincronizzate da Firebase');
         callback(docSnapshot.data().lista || []);
+      } else {
+        console.log('Documento ferie non esiste in Firebase');
       }
+    }, (error) => {
+      console.error('Errore listener ferie:', error);
     });
 
     return unsubscribe;

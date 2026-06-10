@@ -73,6 +73,12 @@ export const StudioProvider = ({ children }) => {
     if (savedDarkMode) setDarkMode(JSON.parse(savedDarkMode));
     if (adminToken) setAdminLogged(true);
 
+    // Salva i dati dal localStorage su Firebase se non esistono
+    if (savedStudio) saveStudioToFirebase(JSON.parse(savedStudio)).catch(() => {});
+    if (savedOrari) saveOrariToFirebase(JSON.parse(savedOrari)).catch(() => {});
+    if (savedServizi) saveServiziToFirebase(JSON.parse(savedServizi)).catch(() => {});
+    if (savedFerie) saveFerieToFirebase(JSON.parse(savedFerie)).catch(() => {});
+
     // Sincronizza prenotazioni da Firebase
     const unsubscribePrenotazioni = subscribeToPrenotazioni((firebasePrenotazioni) => {
       if (firebasePrenotazioni.length > 0) {
@@ -92,16 +98,12 @@ export const StudioProvider = ({ children }) => {
 
     // Sincronizza Servizi da Firebase
     const unsubscribeServizi = subscribeToServizi((firebaseServizi) => {
-      if (firebaseServizi.length > 0) {
-        setServizi(firebaseServizi);
-      }
+      setServizi(firebaseServizi);
     });
 
     // Sincronizza Ferie da Firebase
     const unsubscribeFerie = subscribeToFerie((firebaseFerie) => {
-      if (firebaseFerie.length > 0) {
-        setFerie(firebaseFerie);
-      }
+      setFerie(firebaseFerie);
     });
 
     return () => {
