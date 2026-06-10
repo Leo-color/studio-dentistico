@@ -317,12 +317,26 @@ export const StudioProvider = ({ children }) => {
   };
 
   const addFerie = (feria) => {
-    setFerie(prev => [...prev, { ...feria, id: Date.now() }]);
+    const newFerie = [...ferie, { ...feria, id: Date.now() }];
+    setFerie(newFerie);
+    // Salva su Firebase
+    try {
+      saveFerieToFirebase(newFerie).catch(err => console.error('Errore salvataggio ferie:', err));
+    } catch (error) {
+      console.error('Errore salvataggio ferie:', error);
+    }
     addToast('Ferie aggiunte', 'success');
   };
 
   const removeFerie = (id) => {
-    setFerie(prev => prev.filter(f => f.id !== id));
+    const newFerie = ferie.filter(f => f.id !== id);
+    setFerie(newFerie);
+    // Salva su Firebase
+    try {
+      saveFerieToFirebase(newFerie).catch(err => console.error('Errore salvataggio ferie:', err));
+    } catch (error) {
+      console.error('Errore salvataggio ferie:', error);
+    }
     addToast('Ferie rimosse', 'success');
   };
 
