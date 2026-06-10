@@ -242,12 +242,15 @@ export const subscribeToOrari = (callback) => {
   }
 
   try {
+    console.log('Setup listener Orari per: config/orari');
     const unsubscribe = onSnapshot(doc(db, 'config', 'orari'), (docSnapshot) => {
+      console.log('Listener Orari triggered! Exists:', docSnapshot.exists());
       if (docSnapshot.exists()) {
-        console.log('Orari sincronizzati da Firebase');
+        console.log('Orari sincronizzati da Firebase:', docSnapshot.data());
         callback(docSnapshot.data());
       } else {
-        console.log('Documento orari non esiste in Firebase');
+        console.log('Documento orari non esiste in Firebase - usando default');
+        callback({});
       }
     }, (error) => {
       console.error('Errore listener orari:', error);
