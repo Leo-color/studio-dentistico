@@ -145,12 +145,15 @@ export const saveOrariToFirebase = async (orari) => {
 
   try {
     const docRef = doc(db, 'config', 'orari');
-    await updateDoc(docRef, orari);
+    await updateDoc(docRef, { data: orari, updatedAt: new Date().toISOString() });
     console.log('Orari salvati su Firebase');
   } catch (error) {
     // Se non esiste, crealo
     try {
-      await setDoc(doc(db, 'config', 'orari'), orari);
+      await setDoc(doc(db, 'config', 'orari'), {
+        data: orari,
+        updatedAt: new Date().toISOString(),
+      });
       console.log('Orari creati su Firebase');
     } catch (addError) {
       console.error('Errore salvataggio orari:', addError);
@@ -249,7 +252,8 @@ export const subscribeToOrari = (callback) => {
     unsubscribe = onSnapshot(doc(db, 'config', 'orari'), (docSnapshot) => {
       console.log('Listener Orari triggered! Exists:', docSnapshot.exists());
       if (docSnapshot.exists()) {
-        const newData = docSnapshot.data();
+        const docData = docSnapshot.data();
+        const newData = docData.data || docData;
         console.log('Orari sincronizzati da Firebase:', newData);
         lastData = newData;
         callback(newData);
@@ -266,7 +270,8 @@ export const subscribeToOrari = (callback) => {
     try {
       const docSnapshot = await getDoc(doc(db, 'config', 'orari'));
       if (docSnapshot.exists()) {
-        const newData = docSnapshot.data();
+        const docData = docSnapshot.data();
+        const newData = docData.data || docData;
         if (JSON.stringify(newData) !== JSON.stringify(lastData)) {
           console.log('Polling: Orari aggiornati da Firebase:', newData);
           lastData = newData;
