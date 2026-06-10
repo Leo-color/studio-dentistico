@@ -74,10 +74,22 @@ export const StudioProvider = ({ children }) => {
     if (adminToken) setAdminLogged(true);
 
     // Salva i dati dal localStorage su Firebase se non esistono
-    if (savedStudio) saveStudioToFirebase(JSON.parse(savedStudio)).catch(() => {});
-    if (savedOrari) saveOrariToFirebase(JSON.parse(savedOrari)).catch(() => {});
-    if (savedServizi) saveServiziToFirebase(JSON.parse(savedServizi)).catch(() => {});
-    if (savedFerie) saveFerieToFirebase(JSON.parse(savedFerie)).catch(() => {});
+    if (savedStudio) {
+      console.log('Salvando Studio su Firebase...');
+      saveStudioToFirebase(JSON.parse(savedStudio)).catch(err => console.error('Errore Studio:', err));
+    }
+    if (savedOrari) {
+      console.log('Salvando Orari su Firebase...', JSON.parse(savedOrari));
+      saveOrariToFirebase(JSON.parse(savedOrari)).catch(err => console.error('Errore Orari:', err));
+    }
+    if (savedServizi) {
+      console.log('Salvando Servizi su Firebase...');
+      saveServiziToFirebase(JSON.parse(savedServizi)).catch(err => console.error('Errore Servizi:', err));
+    }
+    if (savedFerie) {
+      console.log('Salvando Ferie su Firebase...');
+      saveFerieToFirebase(JSON.parse(savedFerie)).catch(err => console.error('Errore Ferie:', err));
+    }
 
     // Sincronizza prenotazioni da Firebase
     const unsubscribePrenotazioni = subscribeToPrenotazioni((firebasePrenotazioni) => {
@@ -88,21 +100,25 @@ export const StudioProvider = ({ children }) => {
 
     // Sincronizza Studio da Firebase
     const unsubscribeStudio = subscribeToStudio((firebaseStudio) => {
+      console.log('Listener Studio ricevuto:', firebaseStudio);
       setStudio(firebaseStudio);
     });
 
     // Sincronizza Orari da Firebase
     const unsubscribeOrari = subscribeToOrari((firebaseOrari) => {
+      console.log('Listener Orari ricevuto:', firebaseOrari);
       setOrari(firebaseOrari);
     });
 
     // Sincronizza Servizi da Firebase
     const unsubscribeServizi = subscribeToServizi((firebaseServizi) => {
+      console.log('Listener Servizi ricevuto:', firebaseServizi);
       setServizi(firebaseServizi);
     });
 
     // Sincronizza Ferie da Firebase
     const unsubscribeFerie = subscribeToFerie((firebaseFerie) => {
+      console.log('Listener Ferie ricevuto:', firebaseFerie);
       setFerie(firebaseFerie);
     });
 
@@ -142,19 +158,23 @@ export const StudioProvider = ({ children }) => {
 
   // Salva su Firebase quando cambiano i dati
   useEffect(() => {
-    saveStudioToFirebase(studio);
+    console.log('Saving Studio to Firebase:', studio);
+    saveStudioToFirebase(studio).catch(err => console.error('Studio save error:', err));
   }, [studio]);
 
   useEffect(() => {
-    saveOrariToFirebase(orari);
+    console.log('Saving Orari to Firebase:', orari);
+    saveOrariToFirebase(orari).catch(err => console.error('Orari save error:', err));
   }, [orari]);
 
   useEffect(() => {
-    saveServiziToFirebase(servizi);
+    console.log('Saving Servizi to Firebase:', servizi);
+    saveServiziToFirebase(servizi).catch(err => console.error('Servizi save error:', err));
   }, [servizi]);
 
   useEffect(() => {
-    saveFerieToFirebase(ferie);
+    console.log('Saving Ferie to Firebase:', ferie);
+    saveFerieToFirebase(ferie).catch(err => console.error('Ferie save error:', err));
   }, [ferie]);
 
   const addToast = (message, type = 'info') => {
