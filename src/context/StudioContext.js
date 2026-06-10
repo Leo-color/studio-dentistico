@@ -55,6 +55,9 @@ export const StudioProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
   const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
 
+  // Track last saved data to prevent infinite loops
+  const lastSavedRef = React.useRef({ studio: null, orari: null, servizi: null, ferie: null });
+
   // Load da localStorage
   useEffect(() => {
     const savedStudio = localStorage.getItem('studio');
@@ -156,25 +159,41 @@ export const StudioProvider = ({ children }) => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
-  // Salva su Firebase quando cambiano i dati
+  // Salva su Firebase quando cambiano i dati (evita loop infiniti)
   useEffect(() => {
-    console.log('Saving Studio to Firebase:', studio);
-    saveStudioToFirebase(studio).catch(err => console.error('Studio save error:', err));
+    const studioStr = JSON.stringify(studio);
+    if (studioStr !== lastSavedRef.current.studio) {
+      console.log('Saving Studio to Firebase:', studio);
+      lastSavedRef.current.studio = studioStr;
+      saveStudioToFirebase(studio).catch(err => console.error('Studio save error:', err));
+    }
   }, [studio]);
 
   useEffect(() => {
-    console.log('Saving Orari to Firebase:', orari);
-    saveOrariToFirebase(orari).catch(err => console.error('Orari save error:', err));
+    const orariStr = JSON.stringify(orari);
+    if (orariStr !== lastSavedRef.current.orari) {
+      console.log('Saving Orari to Firebase:', orari);
+      lastSavedRef.current.orari = orariStr;
+      saveOrariToFirebase(orari).catch(err => console.error('Orari save error:', err));
+    }
   }, [orari]);
 
   useEffect(() => {
-    console.log('Saving Servizi to Firebase:', servizi);
-    saveServiziToFirebase(servizi).catch(err => console.error('Servizi save error:', err));
+    const serviziStr = JSON.stringify(servizi);
+    if (serviziStr !== lastSavedRef.current.servizi) {
+      console.log('Saving Servizi to Firebase:', servizi);
+      lastSavedRef.current.servizi = serviziStr;
+      saveServiziToFirebase(servizi).catch(err => console.error('Servizi save error:', err));
+    }
   }, [servizi]);
 
   useEffect(() => {
-    console.log('Saving Ferie to Firebase:', ferie);
-    saveFerieToFirebase(ferie).catch(err => console.error('Ferie save error:', err));
+    const ferieStr = JSON.stringify(ferie);
+    if (ferieStr !== lastSavedRef.current.ferie) {
+      console.log('Saving Ferie to Firebase:', ferie);
+      lastSavedRef.current.ferie = ferieStr;
+      saveFerieToFirebase(ferie).catch(err => console.error('Ferie save error:', err));
+    }
   }, [ferie]);
 
   const addToast = (message, type = 'info') => {
