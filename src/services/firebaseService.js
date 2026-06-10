@@ -1,6 +1,6 @@
 // Firebase Service - Sincronizzazione Prenotazioni
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 // Configurazione Firebase (da environment variables)
@@ -234,33 +234,54 @@ export const subscribeToStudio = (callback) => {
   }
 };
 
-// Sincronizza Orari in tempo reale
+// Sincronizza Orari in tempo reale (con polling fallback)
 export const subscribeToOrari = (callback) => {
   if (!initFirebase()) {
     console.warn('Firebase non configurato');
     return () => {};
   }
 
+  let lastData = null;
+  let unsubscribe = null;
+
   try {
     console.log('Setup listener Orari per: config/orari');
-    const unsubscribe = onSnapshot(doc(db, 'config', 'orari'), (docSnapshot) => {
+    unsubscribe = onSnapshot(doc(db, 'config', 'orari'), (docSnapshot) => {
       console.log('Listener Orari triggered! Exists:', docSnapshot.exists());
       if (docSnapshot.exists()) {
-        console.log('Orari sincronizzati da Firebase:', docSnapshot.data());
-        callback(docSnapshot.data());
-      } else {
-        console.log('Documento orari non esiste in Firebase - usando default');
-        callback({});
+        const newData = docSnapshot.data();
+        console.log('Orari sincronizzati da Firebase:', newData);
+        lastData = newData;
+        callback(newData);
       }
     }, (error) => {
       console.error('Errore listener orari:', error);
     });
-
-    return unsubscribe;
   } catch (error) {
-    console.error('Errore sincronizzazione orari:', error);
-    return () => {};
+    console.error('Errore setup listener orari:', error);
   }
+
+  // Aggiungi polling periodico come fallback
+  const pollInterval = setInterval(async () => {
+    try {
+      const docSnapshot = await getDoc(doc(db, 'config', 'orari'));
+      if (docSnapshot.exists()) {
+        const newData = docSnapshot.data();
+        if (JSON.stringify(newData) !== JSON.stringify(lastData)) {
+          console.log('Polling: Orari aggiornati da Firebase:', newData);
+          lastData = newData;
+          callback(newData);
+        }
+      }
+    } catch (error) {
+      console.error('Errore polling orari:', error);
+    }
+  }, 3000); // Polling ogni 3 secondi
+
+  return () => {
+    if (unsubscribe) unsubscribe();
+    clearInterval(pollInterval);
+  };
 };
 
 // Sincronizza Servizi in tempo reale
