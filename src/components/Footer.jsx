@@ -2,8 +2,18 @@ import React from 'react';
 import { useStudio } from '../context/StudioContext';
 import PrivacyModal from './PrivacyModal';
 
+const giorni = [
+  { key: 'lunedi', label: 'Lunedì' },
+  { key: 'martedi', label: 'Martedì' },
+  { key: 'mercoledi', label: 'Mercoledì' },
+  { key: 'giovedi', label: 'Giovedì' },
+  { key: 'venerdi', label: 'Venerdì' },
+  { key: 'sabato', label: 'Sabato' },
+  { key: 'domenica', label: 'Domenica' },
+];
+
 export const Footer = () => {
-  const { studio, privacyModalOpen, setPrivacyModalOpen } = useStudio();
+  const { studio, orari, privacyModalOpen, setPrivacyModalOpen } = useStudio();
 
   return (
     <>
@@ -34,9 +44,15 @@ export const Footer = () => {
           <div>
             <h3 className="text-2xl font-black mb-6 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Orari di Apertura</h3>
             <div className="space-y-2 text-gray-300 text-sm">
-              <p><span className="font-semibold text-white">Lunedì - Venerdì:</span> 09:00 - 19:00</p>
-              <p><span className="font-semibold text-white">Sabato:</span> 10:00 - 13:00</p>
-              <p><span className="font-semibold text-white">Domenica:</span> Chiuso</p>
+              {giorni.map(giorno => (
+                <p key={giorno.key}>
+                  <span className="font-semibold text-white">{giorno.label}:</span> {
+                    orari[giorno.key]?.aperto
+                      ? `${orari[giorno.key].apertura} - ${orari[giorno.key].chiusura}`
+                      : 'Chiuso'
+                  }
+                </p>
+              ))}
             </div>
           </div>
 
