@@ -278,6 +278,75 @@ export const subscribeToFerie = (callback) => {
   return subscribeWithPolling('config', 'ferie', callback);
 };
 
+// Salva sessione admin su Firebase
+export const saveAdminSessionToFirebase = async (sessionData) => {
+  if (!initFirebase()) {
+    console.warn('Firebase non configurato, salvo solo in localStorage');
+    return;
+  }
+
+  try {
+    const docRef = doc(db, 'admin', 'session');
+    await setDoc(docRef, {
+      data: sessionData,
+      updatedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 giorni
+    });
+    console.log('Sessione admin salvata su Firebase');
+    return true;
+  } catch (error) {
+    console.error('Errore salvataggio sessione admin:', error);
+    return false;
+  }
+};
+
+// Sottoscrive alla sessione admin
+export const subscribeToAdminSession = (callback) => {
+  if (!initFirebase()) {
+    console.warn('Firebase non configurato');
+    return () => {};
+  }
+
+  try {
+    const unsubscribe = onSnapshot(doc(db, 'admin', 'session'), (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const docData = docSnapshot.data();
+        const sessionData = docData.data || docData;
+        console.log('Sessione admin ricevuta:', sessionData);
+        callback(sessionData);
+      } else {
+        console.log('Sessione admin non trovata');
+        callback(null);
+      }
+    }, (error) => {
+      console.error('Errore listener sessione admin:', error);
+    });
+
+    return unsubscribe;
+  } catch (error) {
+    console.error('Errore setup listener sessione admin:', error);
+    return () => {};
+  }
+};
+
+// Elimina sessione admin da Firebase
+export const deleteAdminSessionFromFirebase = async () => {
+  if (!initFirebase()) {
+    console.warn('Firebase non configurato');
+    return;
+  }
+
+  try {
+    const docRef = doc(db, 'admin', 'session');
+    await deleteDoc(docRef);
+    console.log('Sessione admin eliminata da Firebase');
+    return true;
+  } catch (error) {
+    console.error('Errore eliminazione sessione admin:', error);
+    return false;
+  }
+};
+
 export const getFirebaseInstance = () => {
   initFirebase();
   return db;

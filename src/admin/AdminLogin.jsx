@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useStudio } from '../context/StudioContext';
 import { sendAdminCodeEmail } from '../services/emailService';
+import { saveAdminSessionToFirebase, deleteAdminSessionFromFirebase } from '../services/firebaseService';
 
 export const AdminLogin = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export const AdminLogin = () => {
     setCredentials(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError('');
 
@@ -33,7 +34,14 @@ export const AdminLogin = () => {
     const savedPassword = localStorage.getItem('adminPassword') || '1234';
 
     if (credentials.username === 'dentista' && credentials.password === savedPassword) {
-      localStorage.setItem('adminToken', JSON.stringify({ username: credentials.username }));
+      const sessionData = { username: credentials.username, loginTime: new Date().toISOString() };
+
+      // Salva su localStorage
+      localStorage.setItem('adminToken', JSON.stringify(sessionData));
+
+      // Salva su Firebase
+      await saveAdminSessionToFirebase(sessionData);
+
       setAdminLogged(true);
       navigate('/admin/dashboard');
     } else {
@@ -64,14 +72,21 @@ export const AdminLogin = () => {
     setLoading(false);
   };
 
-  const handleVerifyForgotCode = () => {
+  const handleVerifyForgotCode = async () => {
     if (forgotCode !== sentCode) {
       addToast('Codice errato', 'error');
       return;
     }
 
     // Codice corretto, accedi
-    localStorage.setItem('adminToken', JSON.stringify({ email: forgotEmail }));
+    const sessionData = { email: forgotEmail, loginTime: new Date().toISOString() };
+
+    // Salva su localStorage
+    localStorage.setItem('adminToken', JSON.stringify(sessionData));
+
+    // Salva su Firebase
+    await saveAdminSessionToFirebase(sessionData);
+
     setAdminLogged(true);
     addToast('Accesso riuscito!', 'success');
     setShowForgotPassword(false);

@@ -4,6 +4,7 @@ import { useStudio } from '../context/StudioContext';
 import Calendar from 'react-calendar';
 import { getGoogleCalendarEvents, createCustomGoogleCalendarEvent } from '../services/calendarService';
 import { sendContactMessageEmail } from '../services/emailService';
+import { deleteAdminSessionFromFirebase } from '../services/firebaseService';
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -39,8 +40,13 @@ export const AdminDashboard = () => {
     loadCalendarEvents();
   }, [selectedDate]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Rimuovi da localStorage
     localStorage.removeItem('adminToken');
+
+    // Rimuovi da Firebase
+    await deleteAdminSessionFromFirebase();
+
     setAdminLogged(false);
     addToast('Logout effettuato', 'success');
     navigate('/admin');

@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import { sendConfirmationEmail, sendAdminNotificationEmail } from '../services/emailService';
 import { scheduleReminderSMS } from '../services/smsService';
 import { addToGoogleCalendar } from '../services/calendarService';
-import { savePrenotazioneToFirebase, updatePrenotazioneInFirebase, deletePrenotazioneFromFirebase, subscribeToPrenotazioni, subscribeToStudio, subscribeToOrari, subscribeToServizi, subscribeToFerie, saveStudioToFirebase, saveOrariToFirebase, saveServiziToFirebase, saveFerieToFirebase } from '../services/firebaseService';
+import { savePrenotazioneToFirebase, updatePrenotazioneInFirebase, deletePrenotazioneFromFirebase, subscribeToPrenotazioni, subscribeToStudio, subscribeToOrari, subscribeToServizi, subscribeToFerie, saveStudioToFirebase, saveOrariToFirebase, saveServiziToFirebase, saveFerieToFirebase, subscribeToAdminSession } from '../services/firebaseService';
 
 export const StudioContext = createContext();
 
@@ -52,6 +52,7 @@ export const StudioProvider = ({ children }) => {
   const [prenotazioni, setPrenotazioni] = useState([]);
   const [adminLogged, setAdminLogged] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [toasts, setToasts] = useState([]);
   const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
 
@@ -125,12 +126,24 @@ export const StudioProvider = ({ children }) => {
       setFerie(firebaseFerie);
     });
 
+    // Sincronizza sessione admin da Firebase
+    const unsubscribeAdminSession = subscribeToAdminSession((sessionData) => {
+      console.log('Sessione admin ricevuta:', sessionData);
+      if (sessionData) {
+        setAdminLogged(true);
+      }
+    });
+
+    // Caricamento completato
+    setIsLoading(false);
+
     return () => {
       unsubscribePrenotazioni();
       unsubscribeStudio();
       unsubscribeOrari();
       unsubscribeServizi();
       unsubscribeFerie();
+      unsubscribeAdminSession();
     };
   }, []);
 
@@ -397,6 +410,7 @@ export const StudioProvider = ({ children }) => {
     darkMode,
     toasts,
     privacyModalOpen,
+    isLoading,
     setAdminLogged,
     setDarkMode,
     setStudio,
