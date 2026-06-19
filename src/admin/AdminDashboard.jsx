@@ -373,12 +373,6 @@ export const AdminDashboard = () => {
                       >
                         Chiama
                       </a>
-                      <a
-                        href={`mailto:${p.email}`}
-                        className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-                      >
-                        Email
-                      </a>
                     </div>
                   </div>
                 ))}
