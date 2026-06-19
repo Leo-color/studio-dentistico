@@ -29,23 +29,35 @@ export const AdminLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError('');
+    setLoading(true);
 
-    // Leggi password dal localStorage (quella salvata nel cambio password)
-    const savedPassword = localStorage.getItem('adminPassword') || '1234';
+    try {
+      // Leggi password dal localStorage (quella salvata nel cambio password)
+      const savedPassword = localStorage.getItem('adminPassword') || '1234';
 
-    if (credentials.username === 'dentista' && credentials.password === savedPassword) {
-      const sessionData = { username: credentials.username, loginTime: new Date().toISOString() };
+      if (credentials.username === 'dentista' && credentials.password === savedPassword) {
+        const sessionData = { username: credentials.username, loginTime: new Date().toISOString() };
 
-      // Salva su localStorage
-      localStorage.setItem('adminToken', JSON.stringify(sessionData));
+        // Salva su localStorage
+        localStorage.setItem('adminToken', JSON.stringify(sessionData));
 
-      // Salva su Firebase
-      await saveAdminSessionToFirebase(sessionData);
+        // Salva su Firebase
+        try {
+          await saveAdminSessionToFirebase(sessionData);
+        } catch (firebaseError) {
+          console.warn('Firebase non disponibile, ma login salvato in localStorage:', firebaseError);
+        }
 
-      setAdminLogged(true);
-      navigate('/admin/dashboard');
-    } else {
-      setLoginError('Username o password errati');
+        setAdminLogged(true);
+        navigate('/admin/dashboard');
+      } else {
+        setLoginError('Username o password errati');
+      }
+    } catch (error) {
+      setLoginError('Errore durante il login: ' + error.message);
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
