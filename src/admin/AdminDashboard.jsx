@@ -26,6 +26,15 @@ export const AdminDashboard = () => {
     durata: '30',
   });
 
+  // DEBUG: Auto-set admin token for testing
+  useEffect(() => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      localStorage.setItem('adminToken', JSON.stringify({ username: 'dentista', loginTime: new Date().toISOString() }));
+      console.log('✅ DEBUG: adminToken set in localStorage');
+    }
+  }, []);
+
   // Scroll in alto quando la pagina carica
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });

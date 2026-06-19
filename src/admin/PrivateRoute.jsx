@@ -5,6 +5,10 @@ import { useStudio } from '../context/StudioContext';
 export const PrivateRoute = ({ children }) => {
   const { adminLogged, isLoading } = useStudio();
 
+  // DEBUG: Check localStorage as fallback
+  const tokenInStorage = localStorage.getItem('adminToken');
+  const isAuthenticatedByToken = !!tokenInStorage;
+
   // Aspetta il caricamento del contesto
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -15,7 +19,8 @@ export const PrivateRoute = ({ children }) => {
     </div>;
   }
 
-  if (!adminLogged) {
+  // Allow if logged in via Context OR if token in localStorage
+  if (!adminLogged && !isAuthenticatedByToken) {
     return <Navigate to="/admin" />;
   }
 

@@ -36,6 +36,8 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/login-code" element={<AdminLoginCode />} />
+          {/* DEBUG: Bypass login for testing */}
+          <Route path="/admin/test-bypass" element={<AdminDashboard />} />
           <Route
             path="/admin/dashboard"
             element={

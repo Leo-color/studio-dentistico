@@ -7,19 +7,25 @@ export const AdminInfoStudio = () => {
   const [expandedSection, setExpandedSection] = useState('generale');
   const [formData, setFormData] = useState(studio);
   const [savedMessage, setSavedMessage] = useState('');
+  const isDirty = React.useRef(false);
 
   // Sincronizza formData quando studio cambia da Firebase
+  // ma SOLO se l'utente non sta modificando (evita di cancellare le modifiche)
   React.useEffect(() => {
-    setFormData(studio);
+    if (!isDirty.current) {
+      setFormData(studio);
+    }
   }, [studio]);
 
   const handleChange = (e) => {
+    isDirty.current = true;
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSave = (section) => {
     updateStudio(formData);
+    isDirty.current = false;
     setSavedMessage('✓ Dati salvati con successo!');
 
     // Rimuovi il messaggio dopo 3 secondi

@@ -8,10 +8,14 @@ export const AdminOrari = () => {
   const [expandedFerie, setExpandedFerie] = useState(false);
   const [newFeria, setNewFeria] = useState({ dal: '', al: '', motivo: '' });
   const [localOrari, setLocalOrari] = useState(orari);
+  const isDirty = React.useRef(false);
 
   // Sincronizza localOrari quando orari cambia da Firebase
+  // ma SOLO se l'utente non sta modificando (evita di cancellare le modifiche)
   React.useEffect(() => {
-    setLocalOrari(orari);
+    if (!isDirty.current) {
+      setLocalOrari(orari);
+    }
   }, [orari]);
 
   const giorni = [
@@ -25,6 +29,7 @@ export const AdminOrari = () => {
   ];
 
   const handleOraChange = (day, field, value) => {
+    isDirty.current = true;
     setLocalOrari(prev => ({
       ...prev,
       [day]: { ...prev[day], [field]: value }
@@ -32,6 +37,7 @@ export const AdminOrari = () => {
   };
 
   const handleToggleAperto = (day) => {
+    isDirty.current = true;
     setLocalOrari(prev => ({
       ...prev,
       [day]: { ...prev[day], aperto: !prev[day].aperto }
@@ -40,6 +46,7 @@ export const AdminOrari = () => {
 
   const handleSalvaOrari = () => {
     updateOrari(localOrari);
+    isDirty.current = false;
   };
 
   const handleAddFeria = () => {

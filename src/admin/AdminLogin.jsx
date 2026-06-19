@@ -23,6 +23,7 @@ export const AdminLogin = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log('📝 Input changed:', { name, value });
     setCredentials(prev => ({ ...prev, [name]: value }));
   };
 

@@ -57,7 +57,6 @@ export const StudioProvider = ({ children }) => {
   const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
 
   // Track last saved data to prevent infinite loops
-  const lastSavedRef = React.useRef({ studio: null, orari: null, servizi: null, ferie: null });
 
   // Load da localStorage
   useEffect(() => {
@@ -77,23 +76,10 @@ export const StudioProvider = ({ children }) => {
     if (savedDarkMode) setDarkMode(JSON.parse(savedDarkMode));
     if (adminToken) setAdminLogged(true);
 
-    // Salva i dati dal localStorage su Firebase se non esistono
-    if (savedStudio) {
-      console.log('Salvando Studio su Firebase...');
-      saveStudioToFirebase(JSON.parse(savedStudio)).catch(err => console.error('Errore Studio:', err));
-    }
-    if (savedOrari) {
-      console.log('Salvando Orari su Firebase...', JSON.parse(savedOrari));
-      saveOrariToFirebase(JSON.parse(savedOrari)).catch(err => console.error('Errore Orari:', err));
-    }
-    if (savedServizi) {
-      console.log('Salvando Servizi su Firebase...');
-      saveServiziToFirebase(JSON.parse(savedServizi)).catch(err => console.error('Errore Servizi:', err));
-    }
-    if (savedFerie) {
-      console.log('Salvando Ferie su Firebase...');
-      saveFerieToFirebase(JSON.parse(savedFerie)).catch(err => console.error('Errore Ferie:', err));
-    }
+    // NOTA: NON ri-salviamo localStorage su Firebase al mount.
+    // Firebase è la fonte di verità: i listener qui sotto caricano i dati,
+    // e le scritture avvengono SOLO nelle funzioni update esplicite (updateStudio, ecc.)
+    // Questo evita che dati locali obsoleti sovrascrivano Firebase.
 
     // Sincronizza prenotazioni da Firebase
     const unsubscribePrenotazioni = subscribeToPrenotazioni((firebasePrenotazioni) => {
@@ -172,42 +158,9 @@ export const StudioProvider = ({ children }) => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
-  // Salva su Firebase quando cambiano i dati (evita loop infiniti)
-  useEffect(() => {
-    const studioStr = JSON.stringify(studio);
-    if (studioStr !== lastSavedRef.current.studio) {
-      console.log('Saving Studio to Firebase:', studio);
-      lastSavedRef.current.studio = studioStr;
-      saveStudioToFirebase(studio).catch(err => console.error('Studio save error:', err));
-    }
-  }, [studio]);
-
-  useEffect(() => {
-    const orariStr = JSON.stringify(orari);
-    if (orariStr !== lastSavedRef.current.orari) {
-      console.log('Saving Orari to Firebase:', orari);
-      lastSavedRef.current.orari = orariStr;
-      saveOrariToFirebase(orari).catch(err => console.error('Orari save error:', err));
-    }
-  }, [orari]);
-
-  useEffect(() => {
-    const serviziStr = JSON.stringify(servizi);
-    if (serviziStr !== lastSavedRef.current.servizi) {
-      console.log('Saving Servizi to Firebase:', servizi);
-      lastSavedRef.current.servizi = serviziStr;
-      saveServiziToFirebase(servizi).catch(err => console.error('Servizi save error:', err));
-    }
-  }, [servizi]);
-
-  useEffect(() => {
-    const ferieStr = JSON.stringify(ferie);
-    if (ferieStr !== lastSavedRef.current.ferie) {
-      console.log('Saving Ferie to Firebase:', ferie);
-      lastSavedRef.current.ferie = ferieStr;
-      saveFerieToFirebase(ferie).catch(err => console.error('Ferie save error:', err));
-    }
-  }, [ferie]);
+  // NOTA: le scritture su Firebase avvengono SOLO nelle funzioni update esplicite
+  // (updateStudio, updateOrari, addServizio, addFerie, ecc.). Non usiamo più
+  // useEffect automatici che facevano eco ai listener causando race condition.
 
   const addToast = (message, type = 'info') => {
     const id = Date.now();
