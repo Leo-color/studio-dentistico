@@ -43,12 +43,15 @@ export const savePrenotazioneToFirebase = async (prenotazione) => {
   }
 
   try {
-    const docRef = await addDoc(collection(db, 'prenotazioni'), {
+    // Usa l'ID della prenotazione come document ID in Firebase
+    const docRef = doc(db, 'prenotazioni', prenotazione.id);
+    await setDoc(docRef, {
       ...prenotazione,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
-    console.log('Prenotazione salvata su Firebase:', docRef.id);
-    return docRef.id;
+    console.log('Prenotazione salvata su Firebase:', prenotazione.id);
+    return prenotazione.id;
   } catch (error) {
     console.error('Errore salvataggio prenotazione:', error);
     throw error;
