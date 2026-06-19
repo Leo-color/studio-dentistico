@@ -31,11 +31,15 @@ export const AdminLogin = () => {
     setLoginError('');
     setLoading(true);
 
+    console.log('🔐 LOGIN ATTEMPT:', { username: credentials.username, passwordLength: credentials.password.length });
+
     try {
       // Leggi password dal localStorage (quella salvata nel cambio password)
       const savedPassword = localStorage.getItem('adminPassword') || '1234';
+      console.log('🔑 Saved password check:', { saved: savedPassword, entered: credentials.password, match: credentials.password === savedPassword });
 
       if (credentials.username === 'dentista' && credentials.password === savedPassword) {
+        console.log('✅ LOGIN SUCCESSFUL - Setting adminLogged and navigating...');
         const sessionData = { username: credentials.username, loginTime: new Date().toISOString() };
 
         // Salva su localStorage
