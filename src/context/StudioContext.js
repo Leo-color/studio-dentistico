@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { sendConfirmationEmail, sendAdminNotificationEmail } from '../services/emailService';
-import { scheduleReminderSMS } from '../services/smsService';
 import { savePrenotazioneToFirebase, updatePrenotazioneInFirebase, deletePrenotazioneFromFirebase, subscribeToPrenotazioni, subscribeToStudio, subscribeToOrari, subscribeToServizi, subscribeToFerie, saveStudioToFirebase, saveOrariToFirebase, saveServiziToFirebase, saveFerieToFirebase, subscribeToAdminSession } from '../services/firebaseService';
 
 export const StudioContext = createContext();
@@ -171,13 +170,6 @@ export const StudioProvider = ({ children }) => {
       }
     } else {
       addToast('Prenotazione creata (email non configurata)', 'info');
-    }
-
-    // Programma SMS reminder 24h prima
-    try {
-      scheduleReminderSMS({ ...newPrenotazione, studioNome: studio.nome });
-    } catch (error) {
-      console.warn('SMS reminder non programmato:', error);
     }
 
     return id;
