@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useStudio } from '../context/StudioContext';
 import { sendAdminCodeEmail } from '../services/emailService';
-import { saveAdminSessionToFirebase, deleteAdminSessionFromFirebase } from '../services/firebaseService';
+import { saveAdminSessionToFirebase } from '../services/firebaseService';
 
 export const AdminLogin = () => {
   const navigate = useNavigate();

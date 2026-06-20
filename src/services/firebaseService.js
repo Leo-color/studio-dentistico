@@ -1,6 +1,6 @@
 // Firebase Service - Sincronizzazione Prenotazioni
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 // Configurazione Firebase (da environment variables)
@@ -38,8 +38,8 @@ const initFirebase = () => {
 // Salva prenotazione su Firebase
 export const savePrenotazioneToFirebase = async (prenotazione) => {
   if (!initFirebase()) {
-    console.warn('Firebase non configurato, salvo solo in localStorage');
-    return prenotazione.id;
+    console.error('🔴 ERRORE: Firebase non configurato - IMPOSSIBILE SALVARE PRENOTAZIONE');
+    throw new Error('Firebase non disponibile');
   }
 
   try {
@@ -123,20 +123,22 @@ export const subscribeToPrenotazioni = (callback) => {
 // Salva dati Studio su Firebase
 export const saveStudioToFirebase = async (studio) => {
   if (!initFirebase()) {
-    console.warn('Firebase non configurato');
+    console.warn('🔴 Firebase non configurato');
     return;
   }
 
+  console.log('💾 Saving studio to Firebase:', { nome: studio.nome, dottore: studio.dottore });
   try {
     const docRef = doc(db, 'studio', 'info');
     await updateDoc(docRef, { data: studio, updatedAt: new Date().toISOString() });
-    console.log('Studio salvato su Firebase');
+    console.log('✅ STUDIO UPDATE RIUSCITO su Firebase:', studio.nome);
   } catch (error) {
+    console.warn('updateDoc fallito, provo setDoc:', error.message);
     try {
       await setDoc(doc(db, 'studio', 'info'), { data: studio, updatedAt: new Date().toISOString() });
-      console.log('Studio creato su Firebase');
+      console.log('✅ STUDIO CREATO su Firebase:', studio.nome);
     } catch (addError) {
-      console.error('Errore salvataggio studio:', addError);
+      console.error('❌ ERRORE CRITICO salvataggio studio:', addError.message, addError.code);
     }
   }
 };
@@ -205,14 +207,15 @@ export const saveFerieToFirebase = async (ferie) => {
 };
 
 // Helper per subscribere con polling fallback
-const subscribeWithPolling = (collectionPath, docName, callback, pollIntervalMs = 3000) => {
+const subscribeWithPolling = (collectionPath, docName, callback, pollIntervalMs = 30000) => {
   if (!initFirebase()) {
-    console.warn('Firebase non configurato');
+    console.warn('🔴 Firebase non configurato - listener non disponibile');
     return () => {};
   }
 
   let lastData = null;
   let unsubscribe = null;
+  let listenerActive = false;
 
   try {
     unsubscribe = onSnapshot(doc(db, collectionPath, docName), (docSnapshot) => {
@@ -221,34 +224,37 @@ const subscribeWithPolling = (collectionPath, docName, callback, pollIntervalMs 
         const docData = docSnapshot.data();
         newData = docData.data || docData;
       }
-      // Chiama sempre il callback, anche se il documento non esiste
       if (newData && JSON.stringify(newData) !== JSON.stringify(lastData)) {
-        console.log(`Listener ${docName} aggiornato:`, newData);
+        listenerActive = true;
+        console.log(`🟢 Listener ${docName} attivo - aggiornato:`, newData);
         lastData = newData;
         callback(newData);
       }
     }, (error) => {
-      console.error(`Errore listener ${docName}:`, error);
+      console.error(`🔴 Errore listener ${docName}:`, error);
+      listenerActive = false;
     });
   } catch (error) {
-    console.error(`Errore setup listener ${docName}:`, error);
+    console.error(`🔴 Errore setup listener ${docName}:`, error);
+    listenerActive = false;
   }
 
-  // Polling fallback
+  // Polling fallback (solo se listener non è attivo)
   const pollInterval = setInterval(async () => {
+    if (listenerActive) return;
     try {
       const docSnapshot = await getDoc(doc(db, collectionPath, docName));
       if (docSnapshot.exists()) {
         const docData = docSnapshot.data();
         const newData = docData.data || docData;
         if (JSON.stringify(newData) !== JSON.stringify(lastData)) {
-          console.log(`Polling ${docName} aggiornato:`, newData);
+          console.log(`🟡 Polling fallback ${docName} aggiornato:`, newData);
           lastData = newData;
           callback(newData);
         }
       }
     } catch (error) {
-      console.error(`Errore polling ${docName}:`, error);
+      console.error(`🔴 Errore polling ${docName}:`, error);
     }
   }, pollIntervalMs);
 
@@ -281,8 +287,8 @@ export const subscribeToFerie = (callback) => {
 // Salva sessione admin su Firebase
 export const saveAdminSessionToFirebase = async (sessionData) => {
   if (!initFirebase()) {
-    console.warn('Firebase non configurato, salvo solo in localStorage');
-    return;
+    console.error('🔴 ERRORE: Firebase non configurato - IMPOSSIBILE SALVARE SESSIONE ADMIN');
+    return false;
   }
 
   try {
