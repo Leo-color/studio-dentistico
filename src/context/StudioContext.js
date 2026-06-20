@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { sendConfirmationEmail, sendAdminNotificationEmail } from '../services/emailService';
 import { scheduleReminderSMS } from '../services/smsService';
-import { addToGoogleCalendar } from '../services/calendarService';
 import { savePrenotazioneToFirebase, updatePrenotazioneInFirebase, deletePrenotazioneFromFirebase, subscribeToPrenotazioni, subscribeToStudio, subscribeToOrari, subscribeToServizi, subscribeToFerie, saveStudioToFirebase, saveOrariToFirebase, saveServiziToFirebase, saveFerieToFirebase, subscribeToAdminSession } from '../services/firebaseService';
 
 export const StudioContext = createContext();
@@ -58,28 +57,14 @@ export const StudioProvider = ({ children }) => {
 
   // Track last saved data to prevent infinite loops
 
-  // Load da localStorage
+  // Firebase è l'UNICA fonte di verità per tutti i dati principali
+  // localStorage viene usato SOLO per impostazioni UI (darkMode) e token admin
   useEffect(() => {
-    const savedStudio = localStorage.getItem('studio');
-    const savedOrari = localStorage.getItem('orari');
-    const savedServizi = localStorage.getItem('servizi');
-    const savedFerie = localStorage.getItem('ferie');
-    const savedPrenotazioni = localStorage.getItem('prenotazioni');
     const savedDarkMode = localStorage.getItem('darkMode');
     const adminToken = localStorage.getItem('adminToken');
 
-    if (savedStudio) setStudio(JSON.parse(savedStudio));
-    if (savedOrari) setOrari(JSON.parse(savedOrari));
-    if (savedServizi) setServizi(JSON.parse(savedServizi));
-    if (savedFerie) setFerie(JSON.parse(savedFerie));
-    if (savedPrenotazioni) setPrenotazioni(JSON.parse(savedPrenotazioni));
     if (savedDarkMode) setDarkMode(JSON.parse(savedDarkMode));
     if (adminToken) setAdminLogged(true);
-
-    // NOTA: NON ri-salviamo localStorage su Firebase al mount.
-    // Firebase è la fonte di verità: i listener qui sotto caricano i dati,
-    // e le scritture avvengono SOLO nelle funzioni update esplicite (updateStudio, ecc.)
-    // Questo evita che dati locali obsoleti sovrascrivano Firebase.
 
     // Sincronizza prenotazioni da Firebase
     const unsubscribePrenotazioni = subscribeToPrenotazioni((firebasePrenotazioni) => {
@@ -133,27 +118,7 @@ export const StudioProvider = ({ children }) => {
     };
   }, []);
 
-  // Save a localStorage
-  useEffect(() => {
-    localStorage.setItem('studio', JSON.stringify(studio));
-  }, [studio]);
-
-  useEffect(() => {
-    localStorage.setItem('orari', JSON.stringify(orari));
-  }, [orari]);
-
-  useEffect(() => {
-    localStorage.setItem('servizi', JSON.stringify(servizi));
-  }, [servizi]);
-
-  useEffect(() => {
-    localStorage.setItem('ferie', JSON.stringify(ferie));
-  }, [ferie]);
-
-  useEffect(() => {
-    localStorage.setItem('prenotazioni', JSON.stringify(prenotazioni));
-  }, [prenotazioni]);
-
+  // Save solo darkMode a localStorage (impostazione UI, non dato principale)
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
@@ -213,15 +178,6 @@ export const StudioProvider = ({ children }) => {
       scheduleReminderSMS({ ...newPrenotazione, studioNome: studio.nome });
     } catch (error) {
       console.warn('SMS reminder non programmato:', error);
-    }
-
-    // Aggiungi a Google Calendar
-    try {
-      if (process.env.REACT_APP_GOOGLE_CALENDAR_API_KEY) {
-        await addToGoogleCalendar(newPrenotazione, studio);
-      }
-    } catch (error) {
-      console.warn('Google Calendar non sincronizzato:', error);
     }
 
     return id;

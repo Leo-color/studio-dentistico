@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStudio } from '../context/StudioContext';
-import Calendar from 'react-calendar';
-import { getGoogleCalendarEvents, createCustomGoogleCalendarEvent } from '../services/calendarService';
 import { sendContactMessageEmail } from '../services/emailService';
 import { deleteAdminSessionFromFirebase } from '../services/firebaseService';
 
@@ -11,19 +9,11 @@ export const AdminDashboard = () => {
   const { prenotazioni, studio, setAdminLogged, addToast } = useStudio();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [googleEvents, setGoogleEvents] = useState([]);
   const [passwordError, setPasswordError] = useState('');
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
-  });
-  const [showCreateEventModal, setShowCreateEventModal] = useState(false);
-  const [eventData, setEventData] = useState({
-    titolo: '',
-    ora: '09:00',
-    durata: '30',
   });
 
   // DEBUG: Auto-set admin token for testing
@@ -40,15 +30,6 @@ export const AdminDashboard = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  // Fetcha eventi da Google Calendar quando il mese cambia
-  useEffect(() => {
-    const loadCalendarEvents = async () => {
-      const events = await getGoogleCalendarEvents(selectedDate);
-      setGoogleEvents(events);
-    };
-    loadCalendarEvents();
-  }, [selectedDate]);
-
   const handleLogout = async () => {
     // Rimuovi da localStorage
     localStorage.removeItem('adminToken');
@@ -59,60 +40,6 @@ export const AdminDashboard = () => {
     setAdminLogged(false);
     addToast('Logout effettuato', 'success');
     navigate('/admin');
-  };
-
-  const handleCreateEvent = async () => {
-    if (!eventData.titolo || !eventData.data) {
-      addToast('Compila tutti i campi obbligatori', 'error');
-      return;
-    }
-
-    // Converte data a stringa formato YYYY-MM-DD
-    const dataStr = eventData.data instanceof Date
-      ? eventData.data.toISOString().split('T')[0]
-      : eventData.data;
-
-    // Calcola orario di inizio e fine
-    const [hours, minutes] = eventData.ora.split(':');
-    const startTime = new Date(eventData.data);
-    startTime.setHours(parseInt(hours), parseInt(minutes), 0);
-    const endTime = new Date(startTime.getTime() + parseInt(eventData.durata) * 60000);
-
-    // Controlla conflitti con altri eventi
-    const conflictingEvents = googleEvents.filter(event => {
-      const eventDate = new Date(event.start.dateTime || event.start.date);
-      const eventEndDate = new Date(event.end.dateTime || event.end.date);
-
-      // Se non è lo stesso giorno, no conflitto
-      if (eventDate.toDateString() !== startTime.toDateString()) {
-        return false;
-      }
-
-      // Controlla sovrapposizione oraria
-      return (startTime < eventEndDate && endTime > eventDate);
-    });
-
-    if (conflictingEvents.length > 0) {
-      addToast(`Conflitto orario! Ci sono ${conflictingEvents.length} evento(i) in questo slot.`, 'error');
-      return;
-    }
-
-    const success = await createCustomGoogleCalendarEvent({
-      ...eventData,
-      data: dataStr,
-    });
-
-    if (success) {
-      addToast('Evento creato su Google Calendar!', 'success');
-      setShowCreateEventModal(false);
-      setEventData({ titolo: '', ora: '09:00', durata: '30' });
-
-      // Ricarica gli eventi del calendario
-      const events = await getGoogleCalendarEvents(eventData.data);
-      setGoogleEvents(events);
-    } else {
-      addToast('Errore nella creazione dell\'evento', 'error');
-    }
   };
 
   const handleChangePassword = async () => {
@@ -394,92 +321,6 @@ export const AdminDashboard = () => {
             </div>
           )}
 
-          {/* Calendario Appuntamenti da Google Calendar */}
-          <div className="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-gray-900">Calendario (Google Calendar)</h3>
-              <button
-                onClick={() => setShowCreateEventModal(true)}
-                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition"
-              >
-                CREA EVENTO
-              </button>
-            </div>
-            <style>{`
-              .react-calendar {
-                width: 100%;
-                border: none;
-              }
-              .react-calendar__tile {
-                padding: 15px 5px;
-                height: 100px;
-                font-size: 14px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-              }
-              .react-calendar__tile--now {
-                background-color: #f3f4f6;
-              }
-              .react-calendar__tile--active {
-                background-color: #1e40af;
-                color: white;
-              }
-            `}</style>
-            <Calendar
-              value={selectedDate}
-              onChange={setSelectedDate}
-              tileContent={({ date }) => {
-                const appointmentsOnDate = googleEvents.filter(event => {
-                  const eventDate = new Date(event.start.dateTime || event.start.date);
-                  return eventDate.toDateString() === date.toDateString();
-                });
-                return appointmentsOnDate.length > 0 ? (
-                  <div className="mt-2 font-bold text-blue-700 text-lg">
-                    {appointmentsOnDate.length} {appointmentsOnDate.length === 1 ? 'impegno' : 'impegni'}
-                  </div>
-                ) : null;
-              }}
-              className="w-full react-calendar"
-            />
-            <p className="text-sm text-gray-600 font-semibold mt-4 text-center">Sincronizzato con Google Calendar</p>
-            <p className="text-xs text-gray-500 mt-1 text-center">Clicca su un giorno per vedere gli appuntamenti</p>
-
-            {/* Dettagli Appuntamenti del Giorno Selezionato */}
-            <div className="mt-6 p-4 bg-white rounded-lg border border-gray-300">
-              <h4 className="font-bold text-gray-900 mb-1">
-                Appuntamenti per {selectedDate.toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-              </h4>
-              <p className="text-xs text-gray-500 mb-4">Sincronizzati da Google Calendar</p>
-
-              {googleEvents.filter(event => {
-                const eventDate = new Date(event.start.dateTime || event.start.date);
-                return eventDate.toDateString() === selectedDate.toDateString();
-              }).length === 0 ? (
-                <p className="text-gray-600 text-sm">Nessun appuntamento per questo giorno</p>
-              ) : (
-                <div className="space-y-3">
-                  {googleEvents
-                    .filter(event => {
-                      const eventDate = new Date(event.start.dateTime || event.start.date);
-                      return eventDate.toDateString() === selectedDate.toDateString();
-                    })
-                    .map((event, idx) => (
-                      <div key={idx} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <p className="font-semibold text-gray-900">{event.summary}</p>
-                        <p className="text-sm text-gray-600">
-                          ⏰ {new Date(event.start.dateTime).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
-                          {event.end && ` - ${new Date(event.end.dateTime).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`}
-                        </p>
-                        {event.description && <p className="text-xs text-gray-600 mt-1">{event.description}</p>}
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-          </div>
-
           <Link
             to="/admin/prenotazioni"
             className="block text-center mt-8 bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-lg transition-all"
@@ -501,89 +342,6 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Modal Crea Evento */}
-      {showCreateEventModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9998] p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Crea Evento su Google Calendar</h2>
-
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">Titolo Evento *</label>
-                  <input
-                    type="text"
-                    value={eventData.titolo}
-                    onChange={(e) => setEventData({...eventData, titolo: e.target.value})}
-                    placeholder="Es: Visita dal dentista"
-                    className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-700"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">Data *</label>
-                  <input
-                    type="date"
-                    value={eventData.data ? eventData.data.toISOString().split('T')[0] : selectedDate.toISOString().split('T')[0]}
-                    onChange={(e) => setEventData({...eventData, data: new Date(e.target.value)})}
-                    className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-700"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">Ora *</label>
-                  <input
-                    type="time"
-                    value={eventData.ora}
-                    onChange={(e) => setEventData({...eventData, ora: e.target.value})}
-                    className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-700"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">Durata (minuti)</label>
-                  <input
-                    type="number"
-                    value={eventData.durata}
-                    onChange={(e) => setEventData({...eventData, durata: e.target.value})}
-                    placeholder="30"
-                    className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-700"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">Descrizione</label>
-                  <textarea
-                    value={eventData.descrizione || ''}
-                    onChange={(e) => setEventData({...eventData, descrizione: e.target.value})}
-                    placeholder="Note sull'evento..."
-                    rows="3"
-                    className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-700"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setShowCreateEventModal(false);
-                    setEventData({ titolo: '', ora: '09:00', durata: '30' });
-                  }}
-                  className="flex-1 bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg hover:bg-gray-400 transition"
-                >
-                  Annulla
-                </button>
-                <button
-                  onClick={handleCreateEvent}
-                  className="flex-1 bg-green-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-700 transition"
-                >
-                  Crea
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
     </>
   );
