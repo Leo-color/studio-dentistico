@@ -335,6 +335,27 @@ export const subscribeToAdminSession = (callback) => {
   }
 };
 
+// Salva password admin su Firebase
+export const saveAdminPasswordToFirebase = async (newPassword) => {
+  if (!initFirebase()) {
+    console.error('🔴 ERRORE: Firebase non configurato - IMPOSSIBILE SALVARE PASSWORD');
+    return false;
+  }
+
+  try {
+    const docRef = doc(db, 'admin', 'password');
+    await setDoc(docRef, {
+      password: newPassword,
+      updatedAt: new Date().toISOString(),
+    });
+    console.log('✅ Password salvata su Firebase');
+    return true;
+  } catch (error) {
+    console.error('❌ Errore salvataggio password:', error);
+    return false;
+  }
+};
+
 // Elimina sessione admin da Firebase
 export const deleteAdminSessionFromFirebase = async () => {
   if (!initFirebase()) {

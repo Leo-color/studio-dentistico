@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStudio } from '../context/StudioContext';
+import { saveAdminPasswordToFirebase } from '../services/firebaseService';
 import Modal from '../components/Modal';
 
 export const AdminImpostazioni = () => {
@@ -14,9 +15,10 @@ export const AdminImpostazioni = () => {
     conferma: '',
   });
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Credenziali attuali hardcoded (da localStorage in futuro)
-  const CURRENT_PASSWORD = '1234';
+  // Leggi password attuale da localStorage (non hardcoded!)
+  const CURRENT_PASSWORD = localStorage.getItem('adminPassword') || '1234';
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -53,12 +55,30 @@ export const AdminImpostazioni = () => {
     setShowConfirmModal(true);
   };
 
-  const handleConfirmaPassword = () => {
-    // Salva la nuova password in localStorage
-    localStorage.setItem('adminPassword', passwordData.nuova);
-    setShowConfirmModal(false);
-    setPasswordData({ vecchia: '', nuova: '', conferma: '' });
-    addToast('Password cambiata con successo!', 'success');
+  const handleConfirmaPassword = async () => {
+    setIsSaving(true);
+    try {
+      // Salva la nuova password in localStorage
+      localStorage.setItem('adminPassword', passwordData.nuova);
+      console.log('✅ Password salvata in localStorage');
+
+      // Salva la nuova password in Firebase
+      const result = await saveAdminPasswordToFirebase(passwordData.nuova);
+      if (result) {
+        console.log('✅ Password salvata in Firebase');
+      } else {
+        console.warn('⚠️ Password salvata localmente ma Firebase non disponibile');
+      }
+
+      setShowConfirmModal(false);
+      setPasswordData({ vecchia: '', nuova: '', conferma: '' });
+      addToast('Password cambiata con successo!', 'success');
+    } catch (error) {
+      console.error('Errore cambio password:', error);
+      addToast('Errore durante il cambio password', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleLogout = () => {
@@ -147,9 +167,10 @@ export const AdminImpostazioni = () => {
 
                 <button
                   onClick={handleCambiaPassword}
-                  className="w-full bg-blue-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-800 transition"
+                  disabled={isSaving}
+                  className="w-full bg-blue-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Salva Nuova Password
+                  {isSaving ? 'Salvataggio in corso...' : 'Salva Nuova Password'}
                 </button>
               </div>
             )}
