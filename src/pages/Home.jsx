@@ -300,14 +300,6 @@ export const Home = () => {
                     >
                       📧 <strong>Email:</strong> {studio.email}
                     </a>
-                    <a
-                      href={`https://wa.me/${studio.whatsapp?.replace(/\D/g, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-blue-800 hover:underline"
-                    >
-                      💬 <strong>WhatsApp:</strong> Scrivici subito
-                    </a>
                   </div>
                 </div>
               </div>
