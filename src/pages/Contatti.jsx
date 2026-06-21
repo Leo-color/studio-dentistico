@@ -102,69 +102,28 @@ export const Contatti = () => {
 
           </div>
 
-          {/* Colonna destra: Form */}
+          {/* Colonna destra: CTA */}
           <div>
             <div className="bg-white p-8 rounded-lg shadow-lg sticky top-24">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Contattaci Direttamente</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Preferisci Prenotare?</h3>
+              <p className="text-gray-600 mb-6 text-lg">
+                Usa i metodi di contatto a sinistra per raggiungerci direttamente, oppure prenota una visita online!
+              </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">Nome *</label>
-                  <input
-                    type="text"
-                    name="nome"
-                    value={formData.nome}
-                    onChange={handleChange}
-                    placeholder="Il tuo nome"
-                    className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-700 font-semibold"
-                    required
-                  />
-                </div>
+              <Link
+                to="/prenotazioni"
+                className="block w-full bg-green-500 text-white font-bold py-4 px-4 rounded-lg hover:bg-green-600 transition text-lg text-center mb-4"
+              >
+                📅 Prenota Ora
+              </Link>
 
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">Email *</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="tua@email.com"
-                    className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-700 font-semibold"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-2">Messaggio *</label>
-                  <textarea
-                    name="messaggio"
-                    value={formData.messaggio}
-                    onChange={handleChange}
-                    placeholder="Scrivi il tuo messaggio..."
-                    rows="6"
-                    className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-700 font-semibold resize-none"
-                    required
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-blue-700 text-white font-bold py-4 px-4 rounded-lg hover:bg-blue-800 transition text-lg"
-                >
-                  Invia Messaggio
-                </button>
-              </form>
-
-              <hr className="my-8" />
-
-              <div className="text-center">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Vuoi Prenotare?</h3>
-                <Link
-                  to="/prenotazioni"
-                  className="block w-full bg-green-500 text-white font-bold py-4 px-4 rounded-lg hover:bg-green-600 transition text-lg"
-                >
-                  Prenota Ora
-                </Link>
+              <div className="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
+                <h4 className="font-bold text-blue-900 mb-3">Contattaci Direttamente:</h4>
+                <ul className="space-y-3 text-sm text-blue-800">
+                  <li>☎️ <strong>Telefono:</strong> Chiama il numero a sinistra</li>
+                  <li>📧 <strong>Email:</strong> Invia un'email direttamente</li>
+                  <li>💬 <strong>WhatsApp:</strong> Scrivici per una risposta veloce</li>
+                </ul>
               </div>
             </div>
 
