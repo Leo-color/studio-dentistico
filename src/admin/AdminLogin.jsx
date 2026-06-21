@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useStudio } from '../context/StudioContext';
-import { sendAdminCodeEmail } from '../services/emailService';
 import { saveAdminSessionToFirebase } from '../services/firebaseService';
 
 export const AdminLogin = () => {
@@ -78,13 +77,9 @@ export const AdminLogin = () => {
     const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
     setSentCode(randomCode);
 
-    try {
-      await sendAdminCodeEmail(forgotEmail, randomCode);
-      addToast('Codice inviato alla tua email!', 'success');
-      setForgotStep(2);
-    } catch (error) {
-      addToast('Errore nell\'invio del codice', 'error');
-    }
+    // Email disabilitata: mostra il codice direttamente a schermo
+    addToast(`Il tuo codice di accesso è: ${randomCode}`, 'success');
+    setForgotStep(2);
 
     setLoading(false);
   };

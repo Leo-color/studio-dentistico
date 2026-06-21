@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { sendConfirmationEmail, sendAdminNotificationEmail } from '../services/emailService';
 import { savePrenotazioneToFirebase, updatePrenotazioneInFirebase, deletePrenotazioneFromFirebase, subscribeToPrenotazioni, subscribeToStudio, subscribeToOrari, subscribeToServizi, subscribeToFerie, saveStudioToFirebase, saveOrariToFirebase, saveServiziToFirebase, saveFerieToFirebase, subscribeToAdminSession } from '../services/firebaseService';
 
 export const StudioContext = createContext();
@@ -152,25 +151,7 @@ export const StudioProvider = ({ children }) => {
       console.warn('Errore salvataggio Firebase:', error);
     }
 
-    // Invia email di conferma al paziente
-    if (process.env.REACT_APP_SENDGRID_API_KEY) {
-      try {
-        await sendConfirmationEmail(newPrenotazione, studio);
-        addToast('Email di conferma inviata!', 'success');
-      } catch (error) {
-        console.warn('Email non inviata:', error);
-        addToast('Prenotazione confermata (email non disponibile)', 'info');
-      }
-
-      // Invia notifica all'admin
-      try {
-        await sendAdminNotificationEmail(newPrenotazione, studio);
-      } catch (error) {
-        console.warn('Notifica admin non inviata:', error);
-      }
-    } else {
-      addToast('Prenotazione creata (email non configurata)', 'info');
-    }
+    addToast('Prenotazione confermata!', 'success');
 
     return id;
   };

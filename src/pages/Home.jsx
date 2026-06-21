@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useStudio } from '../context/StudioContext';
-import { sendContactMessageEmail } from '../services/emailService';
 import Hero from '../components/Hero';
 import GoogleMap from '../components/GoogleMap';
 
 export const Home = () => {
-  const { servizi, studio, addToast } = useStudio();
-  const [formData, setFormData] = useState({ nome: '', email: '', messaggio: '' });
+  const { servizi, studio } = useStudio();
 
   // Scroll to top quando la pagina si carica
   useEffect(() => {
@@ -19,34 +17,6 @@ export const Home = () => {
     { nome: 'Anna Bianchi', text: 'Studio pulito e moderno', rating: 5 },
     { nome: 'Luca Verdi', text: 'Prenota online è comodissimo', rating: 5 },
   ];
-
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.nome || !formData.email || !formData.messaggio) {
-      addToast('Compila tutti i campi', 'error');
-      return;
-    }
-
-    try {
-      if (process.env.REACT_APP_SENDGRID_API_KEY) {
-        await sendContactMessageEmail(formData, studio);
-        addToast('Messaggio inviato! Ti risponderemo presto.', 'success');
-      } else {
-        addToast('Messaggio ricevuto (email non configurata)', 'info');
-      }
-    } catch (error) {
-      console.warn('Errore invio messaggio:', error);
-      addToast('Errore nell\'invio, riprova', 'error');
-      return;
-    }
-
-    setFormData({ nome: '', email: '', messaggio: '' });
-  };
 
   return (
     <div>
@@ -301,69 +271,44 @@ export const Home = () => {
 
             </div>
 
-            {/* Colonna destra: Form + Mappa */}
+            {/* Colonna destra: CTA + Contatti diretti */}
             <div className="space-y-8">
               <div className="bg-white p-10 rounded-3xl shadow-lg border border-gray-100">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Inviaci Un Email</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Vuoi Prenotare?</h3>
+                <p className="text-gray-600 mb-6">
+                  Prenota una visita online in pochi secondi, oppure contattaci direttamente.
+                </p>
+                <Link
+                  to="/prenotazioni"
+                  className="block w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-4 px-4 rounded-xl hover:shadow-lg transition-all text-lg text-center mb-6"
+                >
+                  📅 Prenota Ora
+                </Link>
 
-                <form onSubmit={handleFormSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">Nome *</label>
-                    <input
-                      type="text"
-                      name="nome"
-                      value={formData.nome}
-                      onChange={handleFormChange}
-                      placeholder="Il tuo nome"
-                      className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-700 font-semibold"
-                      required
-                    />
+                <div className="bg-blue-50 p-6 rounded-2xl border-2 border-blue-200">
+                  <h4 className="font-bold text-blue-900 mb-3">Contattaci Direttamente:</h4>
+                  <div className="space-y-3 text-sm">
+                    <a
+                      href={`tel:${studio.telefono?.replace(/\s/g, '')}`}
+                      className="flex items-center gap-2 text-blue-800 hover:underline"
+                    >
+                      ☎️ <strong>Telefono:</strong> {studio.telefono}
+                    </a>
+                    <a
+                      href={`mailto:${studio.email}`}
+                      className="flex items-center gap-2 text-blue-800 hover:underline"
+                    >
+                      📧 <strong>Email:</strong> {studio.email}
+                    </a>
+                    <a
+                      href={`https://wa.me/${studio.whatsapp?.replace(/\D/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-blue-800 hover:underline"
+                    >
+                      💬 <strong>WhatsApp:</strong> Scrivici subito
+                    </a>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">Email *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleFormChange}
-                      placeholder="tua@email.com"
-                      className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-700 font-semibold"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">Messaggio *</label>
-                    <textarea
-                      name="messaggio"
-                      value={formData.messaggio}
-                      onChange={handleFormChange}
-                      placeholder="Scrivi il tuo messaggio..."
-                      rows="6"
-                      className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-700 font-semibold resize-none"
-                      required
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-blue-700 to-blue-800 text-white font-bold py-4 px-4 rounded-xl hover:shadow-lg transition-all text-lg"
-                  >
-                    Invia Email
-                  </button>
-                </form>
-
-                <hr className="my-8" />
-
-                <div className="text-center">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Vuoi Prenotare?</h3>
-                  <Link
-                    to="/prenotazioni"
-                    className="block w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-4 px-4 rounded-xl hover:shadow-lg transition-all text-lg"
-                  >
-                    Prenota Ora
-                  </Link>
                 </div>
               </div>
 
@@ -376,7 +321,7 @@ export const Home = () => {
       <section className="py-16 px-4 bg-blue-600 text-white">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-8">Pronto per il tuo appuntamento?</h2>
-          <p className="text-lg text-blue-100 mb-8">Prenota adesso e riceverai una conferma via email</p>
+          <p className="text-lg text-blue-100 mb-8">Prenota adesso e ricevi subito la conferma online</p>
           <Link
             to="/prenotazioni"
             className="inline-block bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-50 transition"

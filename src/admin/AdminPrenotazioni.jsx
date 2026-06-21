@@ -87,7 +87,9 @@ export const AdminPrenotazioni = () => {
                   </a>
 
                   <a
-                    href={`mailto:${p.email}`}
+                    href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(p.email)}&su=${encodeURIComponent('Prenotazione Studio Dentistico')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700 font-semibold transition"
                   >
                     ✉️ Email

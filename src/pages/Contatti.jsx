@@ -1,26 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useStudio } from '../context/StudioContext';
 import GoogleMap from '../components/GoogleMap';
 
 export const Contatti = () => {
-  const { studio, addToast } = useStudio();
-  const [formData, setFormData] = useState({ nome: '', email: '', messaggio: '' });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.nome || !formData.email || !formData.messaggio) {
-      addToast('Compila tutti i campi', 'error');
-      return;
-    }
-    addToast(`Messaggio ricevuto! Ti contatteremo presto.`, 'success');
-    setFormData({ nome: '', email: '', messaggio: '' });
-  };
+  const { studio } = useStudio();
 
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4">

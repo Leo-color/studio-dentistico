@@ -68,11 +68,11 @@ export const PrenotazioneConfermata = () => {
           </div>
         </div>
 
-        {/* Email Confirmation */}
-        <div className="bg-blue-50 border-l-4 border-blue-700 p-6 rounded mb-8">
+        {/* Conferma */}
+        <div className="bg-green-50 border-l-4 border-green-600 p-6 rounded mb-8">
           <p className="text-gray-700">
-            🔔 <strong>Email di conferma inviata a:</strong> <br />
-            <span className="font-mono text-blue-700">{prenotazione.email}</span>
+            ✅ <strong>Prenotazione registrata con successo!</strong> <br />
+            Ti consigliamo di annotare data e ora del tuo appuntamento.
           </p>
         </div>
 

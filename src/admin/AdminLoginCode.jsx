@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useStudio } from '../context/StudioContext';
-import { sendAdminCodeEmail } from '../services/emailService';
 
 export const AdminLoginCode = () => {
   const navigate = useNavigate();
@@ -24,14 +23,9 @@ export const AdminLoginCode = () => {
     const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
     setSentCode(randomCode);
 
-    // Invia email con codice
-    try {
-      await sendAdminCodeEmail(email, randomCode);
-      addToast('Codice inviato alla tua email!', 'success');
-      setStep(2);
-    } catch (error) {
-      addToast('Errore nell\'invio del codice', 'error');
-    }
+    // Email disabilitata: mostra il codice direttamente a schermo
+    addToast(`Il tuo codice di accesso è: ${randomCode}`, 'success');
+    setStep(2);
 
     setLoading(false);
   };

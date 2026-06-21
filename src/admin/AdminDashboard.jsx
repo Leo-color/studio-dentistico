@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStudio } from '../context/StudioContext';
-import { sendContactMessageEmail } from '../services/emailService';
 import { deleteAdminSessionFromFirebase } from '../services/firebaseService';
 
 export const AdminDashboard = () => {
@@ -66,17 +65,6 @@ export const AdminDashboard = () => {
     try {
       // Salva la nuova password nel localStorage
       localStorage.setItem('adminPassword', passwordData.newPassword);
-
-      // Invia email al dentista notificando il cambio password
-      try {
-        await sendContactMessageEmail(
-          studio.email,
-          'Cambio Password Admin',
-          `Ciao ${studio.dottore},\n\nLa password dell'account amministrativo è stata cambiata con successo.\n\nSe non hai autorizzato questo cambio, contatta immediatamente il supporto.\n\nStudio Dentistico`
-        );
-      } catch (error) {
-        console.warn('Email non inviata:', error);
-      }
 
       addToast('Password aggiornata con successo!', 'success');
       setShowPasswordModal(false);
