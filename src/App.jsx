@@ -14,6 +14,7 @@ import Prenotazioni from './pages/Prenotazioni';
 import PrenotazioneConfermata from './pages/PrenotazioneConfermata';
 import AnnullaPrenotazione from './pages/AnnullaPrenotazione';
 import MiePrenotazioni from './pages/MiePrenotazioni';
+import { Contatti } from './pages/Contatti';
 
 // Admin
 import AdminLogin from './admin/AdminLogin';
@@ -100,10 +101,10 @@ function App() {
                     <Route path="/prenotazione-confermata/:id" element={<PrenotazioneConfermata />} />
                     <Route path="/mie-prenotazioni" element={<MiePrenotazioni />} />
                     <Route path="/annulla-prenotazione" element={<AnnullaPrenotazione />} />
+                    <Route path="/contatti" element={<Contatti />} />
                     {/* Redirect vecchie rotte alla home */}
                     <Route path="/servizi" element={<Navigate to="/" />} />
                     <Route path="/chi-siamo" element={<Navigate to="/" />} />
-                    <Route path="/contatti" element={<Navigate to="/" />} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </Routes>
                 </main>
