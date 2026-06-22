@@ -293,7 +293,14 @@ export const Prenotazioni = () => {
               value={selectedData}
               onChange={setSelectedData}
               minDate={new Date()}
-              tileDisabled={({ date }) => date.getDay() === 0}
+              tileDisabled={({ date }) => {
+                // Disabilita domeniche
+                if (date.getDay() === 0) return true;
+                // Disabilita giorni in ferie
+                const dateStr = date.toISOString().split('T')[0];
+                if (ferie && ferie.some(f => dateStr >= f.dal && dateStr <= f.al)) return true;
+                return false;
+              }}
               className="w-full"
             />
 

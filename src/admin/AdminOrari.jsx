@@ -6,7 +6,7 @@ export const AdminOrari = () => {
   const { orari, ferie, updateOrari, addFerie, removeFerie, addToast } = useStudio();
   const [expandedDay, setExpandedDay] = useState(null);
   const [expandedFerie, setExpandedFerie] = useState(false);
-  const [newFeria, setNewFeria] = useState({ dal: '', al: '', motivo: '' });
+  const [newFeria, setNewFeria] = useState({ dal: '', al: '' });
   const [localOrari, setLocalOrari] = useState(orari);
   const isDirty = React.useRef(false);
 
@@ -205,18 +205,6 @@ export const AdminOrari = () => {
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">
-                  Motivo (opzionale)
-                </label>
-                <input
-                  type="text"
-                  value={newFeria.motivo}
-                  onChange={(e) => setNewFeria(prev => ({ ...prev, motivo: e.target.value }))}
-                  placeholder="Es: Ferie, Corso, Evento"
-                  className="w-full p-3 border-2 border-yellow-300 rounded-lg focus:border-yellow-600"
-                />
-              </div>
               <button
                 onClick={handleAddFeria}
                 className="w-full bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-yellow-700 transition"
@@ -232,12 +220,9 @@ export const AdminOrari = () => {
               <h3 className="font-bold text-gray-900">Ferie Registrate:</h3>
               {ferie.map(feria => (
                 <div key={feria.id} className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      📅 Da {feria.dal} a {feria.al}
-                    </p>
-                    {feria.motivo && <p className="text-sm text-gray-600">{feria.motivo}</p>}
-                  </div>
+                  <p className="font-semibold text-gray-900">
+                    📅 Da {feria.dal} a {feria.al}
+                  </p>
                   <button
                     onClick={() => removeFerie(feria.id)}
                     className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
