@@ -96,7 +96,7 @@ export const MiePrenotazioni = () => {
         {risultati.length > 0 && (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Prenotazioni trovate ({risultati.length})
+              Prenotazioni trovate - {risultati.length}
             </h2>
 
             {risultati.map(prenotazione => (
