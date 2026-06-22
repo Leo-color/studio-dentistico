@@ -116,7 +116,7 @@ export const AdminLogin = () => {
           {forgotStep === 1 ? (
             <>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Password Dimenticata</h2>
-              <p className="text-gray-600 mb-6">Invieremo un codice di accesso a:</p>
+              <p className="text-gray-600 mb-6">Genera un codice di accesso per l'account:</p>
 
               <div className="space-y-4 mb-6">
                 <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
@@ -143,14 +143,14 @@ export const AdminLogin = () => {
                   disabled={loading}
                   className="flex-1 bg-blue-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-800 transition disabled:opacity-50"
                 >
-                  {loading ? 'Invio...' : 'Invia Codice'}
+                  {loading ? 'Generazione...' : 'Genera Codice'}
                 </button>
               </div>
             </>
           ) : (
             <>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Immetti Codice di Accesso</h2>
-              <p className="text-gray-600 mb-4 text-sm">Abbiamo inviato un codice a {forgotEmail}</p>
+              <p className="text-gray-600 mb-4 text-sm">Inserisci il codice mostrato a schermo per {forgotEmail}</p>
 
               <div className="space-y-4">
                 <div>

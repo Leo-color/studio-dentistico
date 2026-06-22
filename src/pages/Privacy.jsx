@@ -39,7 +39,6 @@ export const Privacy = () => {
             <p>I dati personali sono trattati per le seguenti finalità:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>Gestione e conferma delle prenotazioni</li>
-              <li>Invio di email di conferma e reminder</li>
               <li>Comunicazioni relative agli appuntamenti</li>
               <li>Miglioramento dei servizi offerti</li>
               <li>Adempimenti legali e normativi</li>

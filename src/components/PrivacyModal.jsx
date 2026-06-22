@@ -44,8 +44,6 @@ export const PrivacyModal = ({ isOpen, onClose }) => {
           </p>
           <ul className="list-disc list-inside mb-4 space-y-2">
             <li>Gestire le prenotazioni online</li>
-            <li>Inviare conferme di appuntamento via email o SMS</li>
-            <li>Fornire promemoria di appuntamenti</li>
             <li>Comunicazioni relative al servizio</li>
           </ul>
 

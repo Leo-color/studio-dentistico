@@ -667,7 +667,7 @@ export const Prenotazioni = () => {
             </div>
 
             <div className="p-4 bg-blue-50 rounded-lg mb-8">
-              <p className="text-gray-700">Riceverai una email di conferma a <strong>{formData.email}</strong></p>
+              <p className="text-gray-700">Controlla che i dati siano corretti, poi conferma la prenotazione. Ti consigliamo di annotare data e ora dell'appuntamento.</p>
             </div>
 
             <div className="flex gap-4 mb-6">

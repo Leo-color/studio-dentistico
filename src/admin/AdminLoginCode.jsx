@@ -58,7 +58,7 @@ export const AdminLoginCode = () => {
           <div className="bg-gradient-to-r from-blue-700 to-blue-800 p-10 text-white text-center">
             <h2 className="text-3xl font-bold mb-2">Accesso Sicuro</h2>
             <p className="text-blue-100">
-              {step === 1 ? 'Inserisci la tua email' : 'Inserisci il codice ricevuto'}
+              {step === 1 ? 'Inserisci la tua email' : 'Inserisci il codice generato'}
             </p>
           </div>
 
@@ -86,7 +86,7 @@ export const AdminLoginCode = () => {
                   disabled={loading}
                   className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-4 rounded-lg transition shadow-md hover:shadow-lg text-base disabled:opacity-50"
                 >
-                  {loading ? 'Invio in corso...' : 'Invia Codice'}
+                  {loading ? 'Generazione...' : 'Genera Codice'}
                 </button>
               </div>
             ) : (
@@ -94,7 +94,7 @@ export const AdminLoginCode = () => {
               <div className="space-y-6">
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <p className="text-sm text-gray-700">
-                    Un codice di 6 cifre è stato inviato a:
+                    Inserisci il codice di 6 cifre mostrato a schermo per l'account:
                   </p>
                   <p className="font-bold text-gray-900">{email}</p>
                 </div>
