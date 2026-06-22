@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStudio } from '../context/StudioContext';
-import { deleteAdminSessionFromFirebase } from '../services/firebaseService';
+import { deleteAdminSessionFromFirebase, saveAdminPasswordToFirebase } from '../services/firebaseService';
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -65,6 +65,9 @@ export const AdminDashboard = () => {
     try {
       // Salva la nuova password nel localStorage
       localStorage.setItem('adminPassword', passwordData.newPassword);
+
+      // Salva la nuova password su Firebase
+      await saveAdminPasswordToFirebase(passwordData.newPassword);
 
       addToast('Password aggiornata con successo!', 'success');
       setShowPasswordModal(false);
