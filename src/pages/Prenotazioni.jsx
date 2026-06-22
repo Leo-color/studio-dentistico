@@ -389,33 +389,38 @@ export const Prenotazioni = () => {
               </div>
             </div>
 
-            {/* Pausa */}
-            <div className="mb-8 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
-              <p className="text-gray-700 font-semibold">Studio chiuso 13:00 - 14:30</p>
-            </div>
+            {/* Pomeriggio - Mostra solo se ci sono slot disponibili */}
+            {availableSlots.pomeriggio.some(slot => !slot.disabled) && (
+              <>
+                {/* Pausa */}
+                <div className="mb-8 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+                  <p className="text-gray-700 font-semibold">Studio chiuso 13:00 - 14:30</p>
+                </div>
 
-            {/* Pomeriggio */}
-            <div className="mb-8">
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Pomeriggio (14:30 - 19:00)</h3>
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                {availableSlots.pomeriggio.map(slot => (
-                  <button
-                    key={slot.time}
-                    onClick={() => !slot.disabled && setSelectedOrario(slot.time)}
-                    disabled={slot.disabled}
-                    className={`py-3 px-2 rounded-lg font-semibold transition ${
-                      slot.disabled
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : selectedOrario === slot.time
-                        ? 'bg-blue-900 text-white'
-                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                    }`}
-                  >
-                    {slot.time}
-                  </button>
-                ))}
-              </div>
-            </div>
+                {/* Pomeriggio */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">Pomeriggio (14:30 - 19:00)</h3>
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                    {availableSlots.pomeriggio.map(slot => (
+                      <button
+                        key={slot.time}
+                        onClick={() => !slot.disabled && setSelectedOrario(slot.time)}
+                        disabled={slot.disabled}
+                        className={`py-3 px-2 rounded-lg font-semibold transition ${
+                          slot.disabled
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            : selectedOrario === slot.time
+                            ? 'bg-blue-900 text-white'
+                            : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                        }`}
+                      >
+                        {slot.time}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
 
             {selectedOrario && (
               <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-700">
