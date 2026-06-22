@@ -219,32 +219,23 @@ export const AdminLogin = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-bold text-gray-900 mb-2">
-                  Username
+                  Email
                 </label>
                 <input
-                  type="text"
+                  type="email"
                   name="username"
                   value={credentials.username}
                   onChange={handleChange}
-                  placeholder="dentista"
+                  placeholder="studio@example.com"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 text-base transition"
                   required
                 />
               </div>
 
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="block text-sm font-bold text-gray-900">
-                    Password
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotPassword(true)}
-                    className="text-xs text-blue-700 hover:text-blue-800 transition font-medium cursor-pointer"
-                  >
-                    Password dimenticata?
-                  </button>
-                </div>
+                <label className="block text-sm font-bold text-gray-900 mb-2">
+                  Password
+                </label>
                 <input
                   type="password"
                   name="password"
@@ -271,22 +262,7 @@ export const AdminLogin = () => {
               )}
             </form>
 
-            <div className="my-6 relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-            </div>
-
-            <div className="bg-blue-50 p-6 rounded-lg mb-6 border border-blue-200">
-              <p className="text-center text-gray-800 text-sm">
-                <span className="block font-bold text-gray-900 mb-2">Credenziali Demo</span>
-                <code className="text-blue-700 font-mono">dentista</code>
-                <span className="text-gray-600 mx-2">•</span>
-                <code className="text-blue-700 font-mono">1234</code>
-              </p>
-            </div>
-
-            <div className="space-y-3">
+            <div className="space-y-3 mt-8">
               <Link
                 to="/"
                 className="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg transition"
