@@ -5,8 +5,7 @@ import Modal from '../components/Modal';
 
 export const MiePrenotazioni = () => {
   const { prenotazioni, deletePrenotazione } = useStudio();
-  const [nome, setNome] = useState('');
-  const [cognome, setCognome] = useState('');
+  const [nomeCompleto, setNomeCompleto] = useState('');
   const [risultati, setRisultati] = useState([]);
   const [cercato, setCercato] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -20,16 +19,17 @@ export const MiePrenotazioni = () => {
   const handleCerca = (e) => {
     e.preventDefault();
 
-    if (!nome.trim() || !cognome.trim()) {
+    if (!nomeCompleto.trim()) {
       setRisultati([]);
       setCercato(true);
       return;
     }
 
-    const trovate = prenotazioni.filter(p =>
-      p.nome.toLowerCase().includes(nome.toLowerCase()) &&
-      p.cognome && p.cognome.toLowerCase().includes(cognome.toLowerCase())
-    );
+    const nomeCompletoLower = nomeCompleto.toLowerCase();
+    const trovate = prenotazioni.filter(p => {
+      const prenotazioneNomeCompleto = `${p.nome} ${p.cognome || ''}`.toLowerCase();
+      return prenotazioneNomeCompleto.includes(nomeCompletoLower);
+    });
 
     setRisultati(trovate);
     setCercato(true);
@@ -61,31 +61,17 @@ export const MiePrenotazioni = () => {
         {/* Form di ricerca */}
         <div className="bg-white p-8 rounded-lg shadow-lg mb-8">
           <form onSubmit={handleCerca} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Nome *
-                </label>
-                <input
-                  type="text"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  placeholder="Es: Mario"
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-700 focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Cognome *
-                </label>
-                <input
-                  type="text"
-                  value={cognome}
-                  onChange={(e) => setCognome(e.target.value)}
-                  placeholder="Es: Rossi"
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-700 focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Nome e Cognome *
+              </label>
+              <input
+                type="text"
+                value={nomeCompleto}
+                onChange={(e) => setNomeCompleto(e.target.value)}
+                placeholder="Es: Mario Rossi"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-700 focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             <button
