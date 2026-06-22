@@ -1,0 +1,112 @@
+[
+  {
+    "severity": "CRITICAL",
+    "category": "Security - Authentication Bypass",
+    "file": "src/admin/AdminLoginCode.jsx",
+    "line": 27,
+    "description": "Admin access code exposed in browser toast notification",
+    "code_snippet": "addToast(`Il tuo codice di accesso è: ${randomCode}`, 'success');",
+    "issue": "The 6-digit admin access code is displayed in a client-side toast notification that persists on screen and in browser history. An attacker with physical access to an unattended computer or via screen sharing can see this code. Additionally, toasts often have console/log visibility.",
+    "failure_scenario": "Admin clicks 'Genera Codice', a toast shows code '123456', admin walks away from desk. Attacker using browser dev tools or observing screen sees the code, navigates to login page, enters email + code = unauthorized admin access.",
+    "fix": "Remove the code display from toast. Instead: (1) Copy code to clipboard silently, (2) Show clipboard copied confirmation, OR (3) Display code only in a secure modal that auto-hides after 30 seconds, OR (4) Email the code (restore email service) OR (5) Only show 3 dots in toast 'Code sent to email', with actual code sent via email. At minimum, log the event without displaying the code to users."
+  },
+  {
+    "severity": "CRITICAL",
+    "category": "Security - Authentication Bypass",
+    "file": "src/admin/AdminLogin.jsx",
+    "line": "80-81",
+    "description": "Admin password reset code exposed in browser toast notification",
+    "code_snippet": "addToast(`Il tuo codice di accesso è: ${randomCode}`, 'success');\nsetForgotStep(2);",
+    "issue": "Same issue as AdminLoginCode - the password reset code is visible in a toast on the screen. Anyone observing the screen can read the code and reset admin password.",
+    "failure_scenario": "Admin at reception area initiates password reset, toast displays '654321', receptionist or visitor sees code, can then complete password reset and lock out the actual admin.",
+    "fix": "Same as above - remove code from toast, implement secure code delivery (clipboard, email, or secure modal with auto-hide)."
+  },
+  {
+    "severity": "CRITICAL",
+    "category": "Security - URL Injection / XSS via email",
+    "file": "src/admin/AdminPrenotazioni.jsx",
+    "line": 90,
+    "description": "User email embedded directly in Gmail URL without proper validation",
+    "code_snippet": "href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(p.email)}&su=${encodeURIComponent('Prenotazione Studio Dentistico')}`}",
+    "issue": "While encodeURIComponent is used, if the email field contains special characters or malformed data from Firebase, it could be misused. However, the larger issue is: (1) Opening Gmail in a new window to compose email exposes the user email in URL, (2) If the user's email is compromised in Firebase and contains something like 'attacker@evil.com%0Bcc=admin@studio.com', the attacker could BCC themselves on responses. (3) The app now relies entirely on the user having Gmail logged in - if they use Outlook/Apple Mail, this breaks.",
+    "failure_scenario": "Admin clicks email button for a patient. Browser opens Gmail with URL containing patient email. User closes tab without sending. Later, they notice the email address was logged in browser history. Additionally, if someone checks browser history, they can see all patient emails used for composing.",
+    "fix": "Either: (1) Restore email service (preferred) to send emails server-side without exposing patient emails in URLs, OR (2) Add client-side validation: verify email format and reject suspicious patterns before building URL, OR (3) Use mailto: links instead of Gmail URLs (simpler, works with any email client), OR (4) If Gmail integration is intentional, implement OAuth to verify user owns the Gmail account before opening URL."
+  },
+  {
+    "severity": "HIGH",
+    "category": "Logic Error - Missing Validation",
+    "file": "src/context/StudioContext.js",
+    "line": "154",
+    "description": "Email service failure now silently ignored with no user notification",
+    "code_snippet": "addToast('Prenotazione confermata!', 'success');",
+    "issue": "The code previously sent confirmation emails and admin notifications. Now both are removed entirely (lines 154-172 in old code). The user is told 'Prenotazione confermata!' but no confirmation mechanism exists. If the booking was successful in Firebase but the user didn't properly see/save the confirmation, they have no way to retrieve it later.",
+    "failure_scenario": "Patient books appointment, sees toast 'Prenotazione confermata!', closes browser. Two hours later, they call studio asking if appointment is confirmed. Admin checks system - booking is there - but patient has no email proof. If patient disputes later (didn't show up), there's no email trail. Additionally, admin never receives notification of new booking anymore.",
+    "fix": "Implement one of: (1) Restore email service, OR (2) Display booking details in a modal before confirming (require user to screenshot or print), OR (3) Show a confirmation code prominently that user must save ('Your booking code: PRE-2026-12345'), OR (4) Add SMS confirmation as alternative, OR (5) At minimum, show booking reference number in 'My Bookings' page with all details permanently stored."
+  },
+  {
+    "severity": "HIGH",
+    "category": "Logic Error - Removed Admin Notification",
+    "file": "src/context/StudioContext.js",
+    "line": "154",
+    "description": "Admin no longer receives notification of new bookings",
+    "code_snippet": "addToast('Prenotazione confermata!', 'success');",
+    "issue": "The code that sent admin notifications (sendAdminNotificationEmail) was completely removed. Admin must now manually check the dashboard to see new bookings. No real-time alert means bookings could be missed, appointments could be double-booked, or urgent cases could go unnoticed.",
+    "failure_scenario": "Patient books urgent appointment at 2 AM. Studio website confirms it. Admin doesn't check dashboard until 9 AM. Meanwhile, patient calls thinking nobody received it. Two bookings exist for same time slot because admin didn't know about first one. Patient gets turned away.",
+    "fix": "Restore admin notification via: (1) Email, OR (2) In-app alert/badge on dashboard, OR (3) Toast notification if admin is actively using app, OR (4) Browser push notification, OR (5) Integrate with calendar/CRM system."
+  },
+  {
+    "severity": "HIGH",
+    "category": "Data Loss Risk - Password Change Notification Removed",
+    "file": "src/admin/AdminDashboard.jsx",
+    "line": "67",
+    "description": "Admin password change no longer triggers notification email",
+    "code_snippet": "// Invia email al dentista notificando il cambio password [REMOVED]",
+    "issue": "When admin password is changed, no email notification is sent to the dentist. If the admin account was compromised and attacker changed password, the dentist would have no way to know until they next try to log in.",
+    "failure_scenario": "Attacker gains admin credentials, changes password. Dentist is unaware. Attacker modifies patient data, adds fake bookings, or extracts patient information. Real admin tries to log in later, can't, notices account compromised. Patient data may already be stolen or altered.",
+    "fix": "Send security notification email on password change containing: (1) timestamp, (2) IP address if available, (3) device info, (4) option to report unauthorized change and reset, (5) keep email service enabled for security-critical events even if booking confirmations are disabled."
+  },
+  {
+    "severity": "MEDIUM",
+    "category": "UX/Security - Missing Confirmation Visibility",
+    "file": "src/pages/PrenotazioneConfermata.jsx",
+    "line": "68-73",
+    "description": "Confirmation page no longer shows email delivery status",
+    "code_snippet": "🔔 <strong>Email di conferma inviata a:</strong> [REMOVED]\nreplaced with: ✅ <strong>Prenotazione registrata con successo!</strong>",
+    "issue": "The page used to show 'Email di conferma inviata a: user@email.com', confirming that an email was sent. Now it only says booking was registered. User has no proof an email was (or wasn't) sent. The email field (p.email) is still referenced in the old code, creating confusion about whether emails are actually working.",
+    "failure_scenario": "Patient completes booking, sees 'Prenotazione registrata'. Assumes email was sent. Doesn't check email. Appointment reminder never arrives (because emails are disabled). Patient forgets about booking and doesn't show up.",
+    "fix": "Display booking reference number and instruction: 'Screenshot this page or save your booking code: PRE-2026-12345. You can view this booking anytime in [link to 'Mie Prenotazioni']. Studio will contact you at [phone/WhatsApp] if there are any changes.' OR restore email service."
+  },
+  {
+    "severity": "MEDIUM",
+    "category": "Logic Error - Misleading Privacy Policy",
+    "file": "src/components/PrivacyModal.jsx",
+    "line": "47-48",
+    "description": "Privacy policy lists removed email/SMS services as data handling methods",
+    "code_snippet": "<li>Inviare conferme di appuntamento via email o SMS</li> [REMOVED]\n<li>Fornire promemoria di appuntamenti</li> [REMOVED]",
+    "issue": "Privacy policy no longer mentions email confirmations or reminders, which is correct since they're disabled. However, this change suggests the privacy policy wasn't kept in sync with actual features. If anyone accessed this site while email was enabled, they would have agreed to email collection. Now it's disabled, but there's no migration path for existing users who may still expect emails.",
+    "failure_scenario": "Patient booked appointment 2 weeks ago when emails were enabled, agreed to privacy policy mentioning email confirmations. Now app disables emails. Patient expects reminder email but never receives it. Patient no-shows appointment.",
+    "fix": "Add section to privacy policy: 'Recent Updates: Email confirmations and reminders are temporarily disabled. Patients can view upcoming bookings in [My Bookings] page.' Alternatively, restore email service."
+  },
+  {
+    "severity": "MEDIUM",
+    "category": "Data Consistency - Stale Email Field in UI",
+    "file": "src/pages/Prenotazioni.jsx",
+    "line": 670,
+    "description": "Booking form shows email will be used for confirmation but it won't be",
+    "code_snippet": "Old: <p className=\"text-gray-700\">Riceverai una email di conferma a <strong>{formData.email}</strong></p>\nNew: <p className=\"text-gray-700\">Controlla che i dati siano corretti, poi conferma la prenotazione. Ti consigliamo di annotare data e ora dell'appuntamento.</p>",
+    "issue": "The booking form still collects email address from patient, but the form text no longer mentions that email will be used. This is actually better UX (patient knows email isn't being used), but the email field is still required. Consider: why collect email if you're not using it? It's either a GDPR data collection concern (collecting data you don't need) or it means you plan to restore email later.",
+    "failure_scenario": "Patient fills form wondering 'Why do they need my email if they won't send confirmation?' OR future developer doesn't know email is still collected and stored in Firebase even though confirmations are disabled, potentially violating GDPR minimization principle.",
+    "fix": "Either: (1) Make email optional with note 'Optional - for future contact', OR (2) Restore email service to use the collected email, OR (3) Add checkbox 'Allow us to contact you by email' and only collect if user checks it."
+  },
+  {
+    "severity": "MEDIUM",
+    "category": "Security - Missing Input Validation",
+    "file": "src/admin/AdminLoginCode.jsx",
+    "line": 109,
+    "description": "Code input accepts non-numeric characters despite placeholder hint",
+    "code_snippet": "onChange={(e) => setCode(e.target.value.toUpperCase())}",
+    "issue": "Input accepts any character but placeholder shows '000000'. Line only does .toUpperCase() but doesn't validate numeric-only input. User could type 'ABCDEF' and submit as code. The comparison on line 34 does strict string match, so 'ABCDEF' would pass validation if sentCode was set to 'ABCDEF', but the code is only generated as numeric (line 23: Math.floor(100000...). This is a minor issue because generated codes are numeric, but validation should be explicit.",
+    "failure_scenario": "User types letters, submits, gets 'Codice errato'. Developer later changes code generation to include letters for increased entropy. Validation is still missing. User now can't log in because form accepts but doesn't validate input format properly.",
+    "fix": "Add validation: onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, '').toUpperCase())} to only allow digits, or add type='tel' to input to prevent non-numeric on some devices."
+  }
+]

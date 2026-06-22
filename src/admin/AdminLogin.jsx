@@ -77,8 +77,15 @@ export const AdminLogin = () => {
     const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
     setSentCode(randomCode);
 
-    // Email disabilitata: mostra il codice direttamente a schermo
-    addToast(`Il tuo codice di accesso è: ${randomCode}`, 'success');
+    // Email disabilitata: copia il codice negli appunti
+    try {
+      navigator.clipboard.writeText(randomCode);
+      addToast('✅ Codice copiato negli appunti (6 cifre)', 'success');
+    } catch (err) {
+      // Fallback: mostra il codice in una nota che scompare dopo 15 secondi
+      addToast(`⚠️ Codice: ${randomCode} (scompare tra 15 secondi)`, 'info');
+      setTimeout(() => setSentCode(''), 15000);
+    }
     setForgotStep(2);
 
     setLoading(false);
