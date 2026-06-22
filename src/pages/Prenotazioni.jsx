@@ -100,7 +100,9 @@ export const Prenotazioni = () => {
       .filter(p => p.data === dataStr)
       .forEach(p => {
         const startMin = timeToMinutes(p.orario);
-        const endMin = startMin + (servizio.durata || 30);
+        const duration = servizio.durata || 30;
+        const slotsNeeded = Math.ceil(duration / 30); // Arrotonda verso l'alto
+        const endMin = startMin + (slotsNeeded * 30);
         const allSlots = [...mattineSlots, ...pomeriggioSlots];
 
         allSlots.forEach(slot => {
