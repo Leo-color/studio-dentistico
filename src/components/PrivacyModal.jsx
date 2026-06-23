@@ -63,11 +63,6 @@ export const PrivacyModal = ({ isOpen, onClose }) => {
             <li>Revocare il consenso in qualsiasi momento</li>
           </ul>
 
-          <h3 className="font-bold text-lg text-gray-900 mb-4">6. Contatti</h3>
-          <p className="mb-4">
-            Per domande sulla privacy policy, contattate: {studio?.email || 'info@studiodentistico.it'}
-          </p>
-
           <p className="text-gray-600 text-xs mt-6">
             Ultima modifica: {new Date().toLocaleDateString('it-IT')}
           </p>
