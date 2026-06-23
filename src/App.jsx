@@ -31,7 +31,7 @@ function AppContent() {
 
   useEffect(() => {
     if (studio?.nome) {
-      document.title = `${studio.nome} - Prenota Online`;
+      document.title = studio.nome;
     }
   }, [studio?.nome]);
 
