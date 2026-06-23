@@ -43,7 +43,7 @@ export const Home = () => {
               </div>
               <h3 className="text-xl font-bold mb-4 text-gray-900">Esperienza</h3>
               <p className="text-gray-600 leading-relaxed">
-                {studio.dottore} con specializzazioni in {studio.specializzazioni}. La competenza al servizio della vostra salute.
+                {studio.dottore} con specializzazioni in {studio.specializzazioni}. La cura al servizio del vostro animale.
               </p>
             </div>
 
