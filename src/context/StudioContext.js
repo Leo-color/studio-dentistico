@@ -84,16 +84,25 @@ export const StudioProvider = ({ children }) => {
     // Sincronizza Servizi da Firebase
     const unsubscribeServizi = subscribeToServizi((firebaseServizi) => {
       console.log('Listener Servizi ricevuto:', firebaseServizi);
-      // Se i servizi sono quelli dentistici vecchi, usa i defaultServizi veterinari
+      // Se i servizi sono quelli dentistici vecchi, CANCELLA e SALVA quelli veterinari
       const hasDentalServices = firebaseServizi && firebaseServizi.some(s =>
         s.nome && (s.nome.includes('Otturazione') || s.nome.includes('Sbiancamento') ||
                    s.nome.includes('Endodonzia') || s.nome.includes('Implantologia') ||
                    s.nome.includes('Ortodonzia') || s.nome.includes('Igiene Dentale'))
       );
 
-      if (hasDentalServices || !firebaseServizi || firebaseServizi.length === 0) {
-        console.log('📋 Usando servizi veterinari di default');
-        setServizi(defaultServizi);
+      if (hasDentalServices) {
+        console.log('🔄 CANCELLANDO servizi dentistici e SALVANDO veterinari...');
+        // Cancella i servizi dentistici e salva i veterinari
+        saveServiziToFirebase(defaultServizi).then(() => {
+          console.log('✅ Servizi veterinari salvati su Firebase');
+          setServizi(defaultServizi);
+        });
+      } else if (!firebaseServizi || firebaseServizi.length === 0) {
+        console.log('📋 Salvando servizi veterinari di default su Firebase');
+        saveServiziToFirebase(defaultServizi).then(() => {
+          setServizi(defaultServizi);
+        });
       } else {
         setServizi(firebaseServizi);
       }
