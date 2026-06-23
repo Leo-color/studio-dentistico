@@ -66,9 +66,7 @@ export const StudioProvider = ({ children }) => {
 
     // Sincronizza prenotazioni da Firebase
     const unsubscribePrenotazioni = subscribeToPrenotazioni((firebasePrenotazioni) => {
-      if (firebasePrenotazioni.length > 0) {
-        setPrenotazioni(firebasePrenotazioni);
-      }
+      setPrenotazioni(firebasePrenotazioni);
     });
 
     // Sincronizza Studio da Firebase
