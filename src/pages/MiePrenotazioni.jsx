@@ -25,9 +25,9 @@ export const MiePrenotazioni = () => {
       return;
     }
 
-    const nomeCompletoLower = nomeCompleto.toLowerCase();
+    const nomeCompletoLower = nomeCompleto.toLowerCase().trim();
     const trovate = prenotazioni.filter(p => {
-      const prenotazioneNomeCompleto = `${p.nome} ${p.cognome || ''}`.toLowerCase();
+      const prenotazioneNomeCompleto = (p.nome || '').toLowerCase().trim();
       return prenotazioneNomeCompleto === nomeCompletoLower;
     });
 
