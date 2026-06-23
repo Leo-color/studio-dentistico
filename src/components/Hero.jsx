@@ -19,7 +19,7 @@ export const Hero = () => {
         </h1>
 
         <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-light">
-          Prenota la tua visita dentale online in <span className="font-semibold text-blue-700">pochi secondi</span>. Tecnologia moderna, attenzione personale.
+          Prenota la visita del tuo animale online in <span className="font-semibold text-blue-700">pochi secondi</span>. Tecnologia moderna, attenzione personale.
         </p>
 
         {/* Main CTA Buttons */}

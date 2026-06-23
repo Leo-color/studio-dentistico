@@ -82,7 +82,7 @@ export const AdminLoginCode = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="info@studiodentistico.it"
+                    placeholder="info@clinicaveterinaria.it"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 text-base transition"
                     required
                   />

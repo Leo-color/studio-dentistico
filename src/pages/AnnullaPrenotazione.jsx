@@ -107,7 +107,7 @@ export const AnnullaPrenotazione = () => {
                 </button>
 
                 <p className="text-center text-gray-600 text-sm">
-                  O contatta lo studio: info@studiodentistico.it
+                  O contatta la clinica: info@clinicaveterinaria.it
                 </p>
               </>
             )}

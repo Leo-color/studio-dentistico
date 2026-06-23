@@ -532,7 +532,7 @@ export const Prenotazioni = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">Sei un nuovo paziente?</label>
+                <label className="block text-sm font-bold text-gray-900 mb-2">Sei un nuovo proprietario?</label>
                 <div className="flex gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input

@@ -217,7 +217,7 @@ export const AdminDashboard = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Dashboard Amministrativo
           </h1>
-          <p className="text-lg text-gray-600">Benvenuto! Gestisci il tuo studio dentistico</p>
+          <p className="text-lg text-gray-600">Benvenuto! Gestisci la tua clinica veterinaria</p>
         </div>
 
         {/* Stats Cards */}

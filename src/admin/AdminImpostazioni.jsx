@@ -230,8 +230,8 @@ export const AdminImpostazioni = () => {
                 <div>
                   <p className="text-sm text-gray-600">Supporto</p>
                   <p className="text-lg font-semibold text-gray-900">
-                    <a href="mailto:support@studiodentistico.it" className="text-blue-700 hover:underline">
-                      support@studiodentistico.it
+                    <a href="mailto:support@clinicaveterinaria.it" className="text-blue-700 hover:underline">
+                      support@clinicaveterinaria.it
                     </a>
                   </p>
                 </div>
