@@ -24,7 +24,7 @@ export const PrivacyModal = ({ isOpen, onClose }) => {
         <div className="overflow-y-auto flex-grow p-6 text-gray-700 text-sm leading-relaxed">
           <h3 className="font-bold text-lg text-gray-900 mb-4">1. Introduzione</h3>
           <p className="mb-4">
-            La presente Privacy Policy descrive come {studio?.nome || 'Studio Dentistico'} raccoglie, utilizza e protegge i dati personali degli utenti del sito web.
+            La presente Privacy Policy descrive come {studio?.nome || 'Clinica Veterinaria'} raccoglie, utilizza e protegge i dati personali degli utenti del sito web.
           </p>
 
           <h3 className="font-bold text-lg text-gray-900 mb-4">2. Dati Raccolti</h3>

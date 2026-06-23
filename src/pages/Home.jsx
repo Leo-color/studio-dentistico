@@ -162,12 +162,11 @@ export const Home = () => {
             </div>
             <div>
               <h3 className="text-3xl font-bold mb-4 text-gray-900">
-                Studio Dentistico {studio.nome}
+                {studio.nome}
               </h3>
               <p className="text-gray-600 mb-4 text-lg leading-relaxed">
-                Da oltre 20 anni siamo al servizio della comunità locale, offrendo servizi dentistici
-                di eccellenza. La nostra missione è garantire a ogni paziente un sorriso sano e
-                bellissimo.
+                Da oltre 20 anni siamo al servizio della comunità locale, offrendo servizi veterinari
+                di eccellenza. La nostra missione è garantire il benessere degli animali domestici.
               </p>
               <p className="text-gray-600 mb-6 text-lg leading-relaxed">
                 Utilizziamo tecnologie innovative e seguiamo i più alti standard di igiene e sicurezza.
