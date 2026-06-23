@@ -169,7 +169,7 @@ export const AdminDashboard = () => {
       <nav className="bg-gradient-to-r from-blue-700 to-blue-800 text-white sticky top-0 z-40 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex justify-between items-center">
-            <Link to="/" className="text-3xl font-black text-white">Studio Dentistico</Link>
+            <Link to="/" className="text-3xl font-black text-white">Clinica Veterinaria</Link>
 
             <div className="hidden md:flex gap-6 items-center">
               <div className="text-right">

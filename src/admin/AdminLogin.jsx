@@ -202,7 +202,7 @@ export const AdminLogin = () => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-blue-700 mb-2">Studio Dentistico</h1>
+          <h1 className="text-4xl font-bold text-blue-700 mb-2">Clinica Veterinaria</h1>
           <p className="text-gray-600 text-base font-medium">Pannello Amministrazione</p>
         </div>
 

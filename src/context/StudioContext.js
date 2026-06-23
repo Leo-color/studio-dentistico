@@ -4,16 +4,16 @@ import { savePrenotazioneToFirebase, updatePrenotazioneInFirebase, deletePrenota
 export const StudioContext = createContext();
 
 const defaultStudio = {
-  nome: 'Studio Dentistico Dr. Rossi',
+  nome: 'Clinica Veterinaria Dr. Bianchi',
   indirizzo: 'Via Roma 123',
   cap: '20100',
   citta: 'Milano',
   provincia: 'MI',
   telefono: '02 1234567',
-  email: 'info@studiodentistico.it',
+  email: 'info@clinicaveterinaria.it',
   whatsapp: '+39 333 1234567',
-  dottore: 'Dr. Marco Rossi',
-  specializzazioni: 'Implantologia, Protesi, Estetica',
+  dottore: 'Dr. Marco Bianchi',
+  specializzazioni: 'Chirurgia, Medicina Interna, Ortopedia',
   facebook: 'https://facebook.com',
   instagram: 'https://instagram.com',
 };
@@ -29,14 +29,14 @@ const defaultOrari = {
 };
 
 const defaultServizi = [
-  { id: 1, nome: 'Visita Dentale', prezzo: 30, durata: 20, descrizione: 'Visita completa e consulenza' },
-  { id: 2, nome: 'Pulizia Dentale', prezzo: 50, durata: 30, descrizione: 'Igiene e pulizia professionale' },
-  { id: 3, nome: 'Otturazione', prezzo: 100, durata: 45, descrizione: 'Riempimento cavità dentale' },
-  { id: 4, nome: 'Sbiancamento', prezzo: 200, durata: 60, descrizione: 'Sbiancamento dentale professionale' },
-  { id: 5, nome: 'Endodonzia', prezzo: 300, durata: 90, descrizione: 'Devitalizzazione e trattamento canalare' },
-  { id: 6, nome: 'Implantologia', prezzo: 2000, durata: 120, descrizione: 'Consulenza impianti dentali' },
-  { id: 7, nome: 'Ortodonzia', prezzo: 2000, durata: 120, descrizione: 'Consulenza ortodontica' },
-  { id: 8, nome: 'Igiene Dentale', prezzo: 60, durata: 30, descrizione: 'Seduta di igiene avanzata' },
+  { id: 1, nome: 'Visita Veterinaria', prezzo: 50, durata: 20, descrizione: 'Visita completa e consulenza' },
+  { id: 2, nome: 'Vaccinazione', prezzo: 40, durata: 15, descrizione: 'Somministrazione vaccini' },
+  { id: 3, nome: 'Igiene Orale', prezzo: 80, durata: 30, descrizione: 'Pulizia e detartrage' },
+  { id: 4, nome: 'Microchip', prezzo: 60, durata: 10, descrizione: 'Identificazione elettronica' },
+  { id: 5, nome: 'Intervento Chirurgico', prezzo: 500, durata: 90, descrizione: 'Intervento chirurgico generale' },
+  { id: 6, nome: 'Ecografia', prezzo: 150, durata: 30, descrizione: 'Ecografia diagnostica' },
+  { id: 7, nome: 'Radiografia', prezzo: 100, durata: 20, descrizione: 'Radiografia digitale' },
+  { id: 8, nome: 'Visita Specialistica', prezzo: 120, durata: 30, descrizione: 'Consulenza specialistica' },
 ];
 
 const defaultFerie = [];

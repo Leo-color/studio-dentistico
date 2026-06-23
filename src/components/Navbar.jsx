@@ -61,7 +61,7 @@ export const Navbar = () => {
             onClick={handleLogoClick}
             className="flex-shrink-0 cursor-pointer"
           >
-            <div className="text-2xl font-bold text-blue-700 hover:opacity-80 transition select-none">Studio Dentistico</div>
+            <div className="text-2xl font-bold text-blue-700 hover:opacity-80 transition select-none">Clinica Veterinaria</div>
           </div>
 
           {/* Desktop Menu */}
