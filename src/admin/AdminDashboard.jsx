@@ -19,7 +19,7 @@ export const AdminDashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      localStorage.setItem('adminToken', JSON.stringify({ username: 'dentista', loginTime: new Date().toISOString() }));
+      localStorage.setItem('adminToken', JSON.stringify({ username: 'veterinario', loginTime: new Date().toISOString() }));
       console.log('✅ DEBUG: adminToken set in localStorage');
     }
   }, []);

@@ -153,7 +153,7 @@ export const Home = () => {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-5xl md:text-6xl font-black text-center mb-4 text-gray-900">Chi Siamo</h2>
           <p className="text-center text-gray-600 text-lg mb-12">
-            Scopri il team dietro il tuo sorriso
+            Scopri il team dedicato alla salute del tuo animale
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
@@ -201,16 +201,16 @@ export const Home = () => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white p-6 rounded-xl border-l-4 border-purple-500 hover:shadow-lg transition">
-                <h4 className="font-bold text-gray-900 text-lg text-purple-700">Implantologia</h4>
-                <p className="text-gray-600 mt-2">Impianti dentali fissi e sicuri</p>
+                <h4 className="font-bold text-gray-900 text-lg text-purple-700">Chirurgia</h4>
+                <p className="text-gray-600 mt-2">Interventi chirurgici sicuri e precisi</p>
               </div>
               <div className="bg-white p-6 rounded-xl border-l-4 border-pink-500 hover:shadow-lg transition">
-                <h4 className="font-bold text-gray-900 text-lg text-pink-700">Estetica Dentale</h4>
-                <p className="text-gray-600 mt-2">Sbiancamenti e sorrisi più belli</p>
+                <h4 className="font-bold text-gray-900 text-lg text-pink-700">Medicina Interna</h4>
+                <p className="text-gray-600 mt-2">Diagnosi e cure complete</p>
               </div>
               <div className="bg-white p-6 rounded-xl border-l-4 border-cyan-500 hover:shadow-lg transition">
-                <h4 className="font-bold text-gray-900 text-lg text-cyan-700">Ortodonzia</h4>
-                <p className="text-gray-600 mt-2">Allineamento perfetto dei denti</p>
+                <h4 className="font-bold text-gray-900 text-lg text-cyan-700">Ortopedia</h4>
+                <p className="text-gray-600 mt-2">Trattamenti muscolari e ossei</p>
               </div>
               <div className="bg-white p-6 rounded-xl border-l-4 border-green-500 hover:shadow-lg transition">
                 <h4 className="font-bold text-gray-900 text-lg text-green-700">Prevenzione</h4>

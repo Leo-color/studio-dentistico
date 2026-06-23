@@ -79,7 +79,7 @@ export const AdminServizi = () => {
                 type="text"
                 value={newServizio.nome}
                 onChange={(e) => setNewServizio(prev => ({ ...prev, nome: e.target.value }))}
-                placeholder="Es: Pulizia Dentale"
+                placeholder="Es: Visita Veterinaria"
                 className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-700 font-semibold"
               />
             </div>

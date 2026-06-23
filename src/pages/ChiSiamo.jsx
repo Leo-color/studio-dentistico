@@ -96,8 +96,8 @@ export const ChiSiamo = () => {
                 <span className="font-bold text-blue-600">A</span>
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">Implantologia</h3>
-                <p className="text-gray-600">Impianti dentali fissi e sicuri</p>
+                <h3 className="font-bold text-gray-900">Chirurgia</h3>
+                <p className="text-gray-600">Interventi chirurgici sicuri</p>
               </div>
             </div>
             <div className="flex gap-3 items-start">
@@ -105,8 +105,8 @@ export const ChiSiamo = () => {
                 <span className="font-bold text-blue-600">B</span>
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">Estetica Dentale</h3>
-                <p className="text-gray-600">Sbiancamenti e sorrisi più belli</p>
+                <h3 className="font-bold text-gray-900">Medicina Interna</h3>
+                <p className="text-gray-600">Diagnosi e cure specializzate</p>
               </div>
             </div>
             <div className="flex gap-3 items-start">
@@ -114,8 +114,8 @@ export const ChiSiamo = () => {
                 <span className="font-bold text-blue-600">C</span>
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">Ortodonzia</h3>
-                <p className="text-gray-600">Allineamento perfetto dei denti</p>
+                <h3 className="font-bold text-gray-900">Ortopedia</h3>
+                <p className="text-gray-600">Trattamenti muscolari e ossei</p>
               </div>
             </div>
             <div className="flex gap-3 items-start">
