@@ -47,12 +47,7 @@ export const PrivacyModal = ({ isOpen, onClose }) => {
             <li>Comunicazioni relative al servizio</li>
           </ul>
 
-          <h3 className="font-bold text-lg text-gray-900 mb-4">4. Protezione dei Dati</h3>
-          <p className="mb-4">
-            I vostri dati sono protetti con crittografia SSL/TLS e conformi al GDPR. Non condividiamo i vostri dati con terzi senza il vostro consenso.
-          </p>
-
-          <h3 className="font-bold text-lg text-gray-900 mb-4">5. Diritti dell'Utente</h3>
+          <h3 className="font-bold text-lg text-gray-900 mb-4">4. Diritti dell'Utente</h3>
           <p className="mb-4">
             Avete il diritto di:
           </p>
