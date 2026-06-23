@@ -297,8 +297,11 @@ export const Prenotazioni = () => {
                 // Disabilita domeniche
                 if (date.getDay() === 0) return true;
                 // Disabilita giorni in ferie
-                const dateStr = date.toISOString().split('T')[0];
-                if (ferie && ferie.some(f => dateStr >= f.dal && dateStr <= f.al)) return true;
+                if (ferie && ferie.some(f => {
+                  const dal = new Date(f.dal + 'T00:00:00');
+                  const al = new Date(f.al + 'T23:59:59');
+                  return date >= dal && date <= al;
+                })) return true;
                 return false;
               }}
               className="w-full"
