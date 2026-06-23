@@ -158,7 +158,7 @@ export const AdminLoginCode = () => {
 
         {/* Footer Info */}
         <div className="text-center mt-8 text-gray-600 text-sm">
-          <p>Accesso riservato ai dentisti</p>
+          <p>Accesso riservato ai veterinari</p>
         </div>
       </div>
     </div>
