@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { StudioProvider } from './context/StudioContext';
+import { StudioProvider, useStudio } from './context/StudioContext';
 import ToastContainer from './components/Toast';
 import PrivateRoute from './admin/PrivateRoute';
 
@@ -26,12 +26,17 @@ import AdminInfoStudio from './admin/AdminInfoStudio';
 import AdminServizi from './admin/AdminServizi';
 import AdminImpostazioni from './admin/AdminImpostazioni';
 
-function App() {
-  return (
-    <StudioProvider>
-      <BrowserRouter>
-        <ToastContainer />
+function AppContent() {
+  const { studio } = useStudio();
 
+  useEffect(() => {
+    if (studio?.nome) {
+      document.title = `${studio.nome} - Prenota Online`;
+    }
+  }, [studio?.nome]);
+
+  return (
+      <BrowserRouter>
         {/* Routes */}
         <Routes>
           {/* Admin Routes */}
@@ -114,6 +119,14 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
+    );
+}
+
+function App() {
+  return (
+    <StudioProvider>
+      <ToastContainer />
+      <AppContent />
     </StudioProvider>
   );
 }
