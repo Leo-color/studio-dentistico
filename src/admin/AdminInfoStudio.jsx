@@ -56,10 +56,10 @@ export const AdminInfoStudio = () => {
       ]
     },
     {
-      key: 'dottore',
-      title: 'Informazioni Dottore',
+      key: 'veterinario',
+      title: 'Informazioni Veterinario',
       fields: [
-        { name: 'dottore', label: 'Nome Dottore' },
+        { name: 'dottore', label: 'Nome Veterinario' },
         { name: 'specializzazioni', label: 'Specializzazioni', type: 'textarea' },
       ]
     },
