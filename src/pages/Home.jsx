@@ -13,9 +13,9 @@ export const Home = () => {
   }, []);
 
   const testimonials = [
-    { nome: 'Marco Rossi', text: 'Ottimo servizio, gentilissimi!', rating: 5 },
-    { nome: 'Anna Bianchi', text: 'Studio pulito e moderno', rating: 5 },
-    { nome: 'Luca Verdi', text: 'Prenota online è comodissimo', rating: 5 },
+    { nome: 'Marco Rossi', text: 'Clinica meravigliosa, il mio cane è in ottime mani!', rating: 5 },
+    { nome: 'Anna Bianchi', text: 'Professionali, moderni e soprattutto amorevoli con gli animali', rating: 5 },
+    { nome: 'Luca Verdi', text: 'Prenotare online è facilissimo e la visita è stata eccellente', rating: 5 },
   ];
 
   return (
@@ -25,45 +25,69 @@ export const Home = () => {
         <Hero />
       </section>
 
+      {/* Trust Badges */}
+      <section className="py-12 px-4 bg-white border-b border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-blue-600 mb-2">20+</div>
+              <p className="text-gray-600 font-medium">Anni di Esperienza</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-green-600 mb-2">1000+</div>
+              <p className="text-gray-600 font-medium">Animali Curati</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-cyan-600 mb-2">100%</div>
+              <p className="text-gray-600 font-medium">Soddisfazione Garantita</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Divider */}
       <div className="bg-gradient-to-r from-transparent via-blue-600 to-transparent" style={{ height: '2px' }}></div>
 
       {/* Perché sceglierci */}
-      <section className="py-20 px-4 bg-gradient-to-b from-white to-blue-50">
+      <section className="py-24 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-gray-900">
-            Perché Sceglierci
-          </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-cyan-500 mx-auto mb-16"></div>
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Perché Sceglierci
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Una clinica veterinaria moderna che mette al centro il benessere del tuo animale
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-lg border-2 border-blue-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 hover:border-blue-400">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center mb-5">
-                <span className="text-white text-2xl font-bold">✓</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-10 rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                <span className="text-2xl">👨‍⚕️</span>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Esperienza</h3>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">Esperienza</h3>
               <p className="text-gray-600 leading-relaxed">
-                {studio.dottore} con specializzazioni in {studio.specializzazioni}. La cura al servizio del vostro animale.
+                {studio.dottore} con specializzazioni in {studio.specializzazioni}. Professionalità al servizio della salute del tuo animale.
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-cyan-50 to-white p-8 rounded-2xl shadow-lg border-2 border-cyan-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 hover:border-cyan-400">
-              <div className="w-14 h-14 bg-gradient-to-br from-cyan-600 to-cyan-700 rounded-full flex items-center justify-center mb-5">
-                <span className="text-white text-2xl font-bold">⚡</span>
+            <div className="bg-white p-10 rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mb-6">
+                <span className="text-2xl">📱</span>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Prenota Online</h3>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">Prenotazione Online</h3>
               <p className="text-gray-600 leading-relaxed">
-                Semplice, rapido e intuitivo. Prenota quando vuoi, 24 ore su 24, da qualsiasi dispositivo.
+                Semplice e intuitivo. Prenota quando vuoi, 24 ore su 24, da qualsiasi dispositivo in pochi secondi.
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl shadow-lg border-2 border-green-200 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 hover:border-green-400">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center mb-5">
-                <span className="text-white text-2xl font-bold">♥</span>
+            <div className="bg-white p-10 rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                <span className="text-2xl">❤️</span>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">Accoglienza</h3>
+              <h3 className="text-2xl font-bold mb-3 text-gray-900">Accoglienza Calorosa</h3>
               <p className="text-gray-600 leading-relaxed">
-                Un ambiente sereno e un team attento. Perché la vostra tranquillità è la nostra priorità.
+                Un ambiente tranquillo e un team che ama davvero gli animali. La serenità del tuo compagno è la nostra priorità.
               </p>
             </div>
           </div>
