@@ -64,6 +64,22 @@ export const StudioProvider = ({ children }) => {
     if (savedDarkMode) setDarkMode(JSON.parse(savedDarkMode));
     if (adminToken) setAdminLogged(true);
 
+    // Inizializza Firebase con dati di default al primo avvio
+    const initializeFirebaseDefaults = async () => {
+      console.log('🟢 Verifico che TUTTI i dati siano in Firebase...');
+      try {
+        // Salva dati di default se non presenti
+        await saveStudioToFirebase(defaultStudio);
+        await saveOrariToFirebase(defaultOrari);
+        await saveServiziToFirebase(defaultServizi);
+        console.log('✅ Dati di default sincronizzati con Firebase');
+      } catch (error) {
+        console.error('⚠️ Errore sincronizzazione dati di default:', error);
+      }
+    };
+
+    initializeFirebaseDefaults();
+
     // Sincronizza prenotazioni da Firebase
     const unsubscribePrenotazioni = subscribeToPrenotazioni((firebasePrenotazioni) => {
       setPrenotazioni(firebasePrenotazioni);
