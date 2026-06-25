@@ -55,7 +55,7 @@ export const AdminLogin = () => {
         setAdminLogged(true);
         navigate('/admin/dashboard');
       } else {
-        setLoginError('Username o password errati');
+        setLoginError('Email o password errati');
       }
     } catch (error) {
       setLoginError('Errore durante il login: ' + error.message);
